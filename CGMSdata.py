@@ -103,7 +103,7 @@ class CGMSData(object):
         self.test_n = self.test_x.shape[0]
         print("Train data size: %d" % self.train_n)
         print("Test data size: %d" % self.test_n)
-        self._scale(False)
+        self._scale(True)
 
         self.train_weights = None
         if padding != "None":
@@ -155,12 +155,15 @@ class CGMSData(object):
         plt.figure()
         for i in idx:
             plt.plot(self.train_x[i] / self.scale, marker="o")
-        y = self.train_y[idx] if self.train_y.ndim == 1 else self.train_y[idx, -1]
-        plt.plot(
-            np.full(n, self.sampling_horizon + self.prediction_horizon - 1),
-            y / self.scale,
-            "o",
-        )
+            # now plot the corresponding y in a way that makes it clear
+            # which x it corresponds to
+            y = self.train_y[i]
+            plt.plot(
+                np.arange(self.sampling_horizon, self.sampling_horizon + y.size),
+                y / self.scale,
+                marker="o",
+            )
+
         plt.xlabel("Time (%d min)" % (self.interval))
         plt.title("%d samples" % n)
         plt.show()
@@ -194,10 +197,11 @@ class CGMSData(object):
 def main():
     data = CGMSData(
         "OH",
-        "data/00221634/direct-sharing-31/00221634_entries_2018-03-01_to_2018-08-05.json",
+        "data/04762925/direct-sharing-31/04762925_entries_2016-01-01_to_2018-04-17.json",
         5,
     )
-    data.reset(7, 6, 1, 0.2, True, "History", 0.5)
+
+    data.reset(7, 6, 1, 3, True, "History", 0.5)
     data.render_data()
 
 if __name__ == "__main__":

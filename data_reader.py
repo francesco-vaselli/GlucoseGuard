@@ -12,6 +12,8 @@ class DataReader:
     def read(self):
         if self.datatype == "OH":
             return self.read_OH()
+        else:
+            raise ValueError("Invalid datatype: {}".format(self.datatype))
 
     def read_OH(self):
         with open(self.filepath, 'r') as file:
@@ -43,5 +45,6 @@ class DataReader:
             else:
                 if value is not None:
                     res.append([value])
+                    
         return res
 

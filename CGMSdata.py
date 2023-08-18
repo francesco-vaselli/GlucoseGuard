@@ -26,10 +26,12 @@ class CGMSData(object):
         self.train_idx = None
 
     def _smooth(self, window_length, polyorder):
-        self.data = list(map(
-            lambda x: signal.savgol_filter(x, window_length, polyorder),
-            filter(lambda x: len(x) > window_length, self.raw_data),
-        ))
+        self.data = list(
+            map(
+                lambda x: signal.savgol_filter(x, window_length, polyorder),
+                filter(lambda x: len(x) > window_length, self.data), # changed from self.raw_data to combine mutpile patients
+            )
+        )
 
     def _cut_point(self):
         s = list(map(lambda d: d.size, self.data))
@@ -62,18 +64,49 @@ class CGMSData(object):
 
     def _scale(self, standardize):
         if standardize:
-            # mean and std of training data of OhioT1DM, Bevan
-            mean = 158.288
-            std = 60.565
+            # Determine if test data exists
+            test_exists = len(self.test_x) > 0 and len(self.test_y) > 0
+
+            # Calculate mean and std based on the presence of test data
+            if test_exists:
+                all_data = np.concatenate(
+                    [
+                        np.concatenate(self.train_x, axis=0),
+                        np.concatenate(self.train_y, axis=0),
+                        np.concatenate(self.test_x, axis=0),
+                        np.concatenate(self.test_y, axis=0),
+                    ],
+                    axis=0,
+                )
+            else:
+                all_data = np.concatenate(
+                    [
+                        np.concatenate(self.train_x, axis=0),
+                        np.concatenate(self.train_y, axis=0),
+                    ],
+                    axis=0,
+                )
+
+            mean = np.mean(all_data)
+            std = np.std(all_data)
+
+            # Log the values
+            print(f"Computed Mean: {mean}, Computed Std: {std}")
+
+            # Apply standardization
             self.train_x = (self.train_x - mean) / std
             self.train_y = (self.train_y - mean) / std
-            self.test_x = (self.test_x - mean) / std
-            self.test_y = (self.test_y - mean) / std
+
+            if test_exists:
+                self.test_x = (self.test_x - mean) / std
+                self.test_y = (self.test_y - mean) / std
         else:
             self.train_x *= self.scale
             self.train_y *= self.scale
-            self.test_x *= self.scale
-            self.test_y *= self.scale
+            if len(self.test_x) > 0 and len(self.test_y) > 0:
+                self.test_x *= self.scale
+                self.test_y *= self.scale
+
 
     def reset(
         self,
@@ -203,6 +236,7 @@ def main():
 
     data.reset(7, 6, 1, 3, True, "History", 0.5)
     data.render_data()
+
 
 if __name__ == "__main__":
     main()

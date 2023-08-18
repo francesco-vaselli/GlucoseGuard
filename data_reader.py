@@ -16,28 +16,30 @@ class DataReader:
             raise ValueError("Invalid datatype: {}".format(self.datatype))
 
     def read_OH(self):
-        with open(self.filepath, 'r') as file:
+        with open(self.filepath, "r") as file:
             data = json.load(file)
 
         res = []
-        
+
         # Since data is in descending order, reverse it to process sequentially
         data.reverse()
 
         # Initialize with the first reading
-        res.append([data[0]['sgv']])
-        
+        res.append([data[0]["sgv"]])
+
         for i in range(1, len(data)):
             # print(data[i]['dateString'])
-            t1 = parser.parse(data[i]['dateString'])
-            t0 = parser.parse(data[i-1]['dateString'])
+            t1 = parser.parse(data[i]["dateString"])
+            t0 = parser.parse(data[i - 1]["dateString"])
 
             delt = t1 - t0
 
             try:
-                value = data[i]['sgv']
+                value = data[i]["sgv"]
             except KeyError:
-                value = data[i].get('mbg', None)  # If 'mbg' is also not present, it will assign None.
+                value = data[i].get(
+                    "mbg", None
+                )  # If 'mbg' is also not present, it will assign None.
 
             if delt <= self.interval_timedelta:
                 if value is not None:
@@ -45,6 +47,5 @@ class DataReader:
             else:
                 if value is not None:
                     res.append([value])
-                    
-        return res
 
+        return res

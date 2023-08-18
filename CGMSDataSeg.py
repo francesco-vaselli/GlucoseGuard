@@ -75,7 +75,7 @@ class CGMSDataSeg(CGMSData):
         self.prediction_horizon = prediction_horizon
         self.scale = scale
         self.train_test_ratio = train_test_ratio
-
+        print("Resetting data...")
         if smooth:
             window_length = sampling_horizon
             if window_length % 2 == 0:
@@ -89,8 +89,8 @@ class CGMSDataSeg(CGMSData):
             if self.set_cutpoint < x.shape[0] and self.set_cutpoint > 0:
                 c = self.set_cutpoint
             elif self.set_cutpoint < 0:
-                print("Train data requested beyond limit, using all but last one")
-                c = -2
+                print("Train data requested beyond limit, using all as train data")
+                c = x.shape[0]
         self._original_train_x = x[0:c]
         self._original_train_y = y[0:c]
         # detect hypo in training data
@@ -128,7 +128,11 @@ class CGMSDataSeg(CGMSData):
         self.test_n = self.test_x.shape[0]
         print("#" * 28 + " Data structure summary " + "#" * 28)
         print("Hypo/no_hypo: {}/{}".format(len(hypo_loc), len(nonhypo_loc)))
-        print("Found {} continuous time series".format(len(self.data)))
+        print(
+            "Found {} continuous time series, however not all will pass the window requirements".format(
+                len(self.data)
+            )
+        )
         print(
             "Data shape: {}, Train/test: {}/{}".format(
                 x.shape, self.train_x.shape[0], self.test_n
@@ -221,14 +225,14 @@ class CGMSDataSeg(CGMSData):
         for _ in range(num_augmentations):
             # Generate Gaussian noise
             gaussian_noise = np.random.normal(0, var, size=self._hypo_train_x.shape)
-            
+
             # Apply Gaussian noise to the input sequences
             augmented_train_x.append(self._hypo_train_x + gaussian_noise)
             augmented_train_y.append(self._hypo_train_y)
-            
+
         # Concatenate original and augmented data along the first axis (rows)
         self.train_x = np.vstack(augmented_train_x)
-        
+
         if padding == "Same" or padding == "History":
             self.train_y = np.vstack(augmented_train_y)
         elif padding == "None":
@@ -241,12 +245,11 @@ class CGMSDataSeg(CGMSData):
         # Scale data
         self.train_x *= self.scale
         self.train_y *= self.scale
-        
+
         self.train_n = self.train_x.shape[0]
         self.train_idx = np.arange(self.train_n)
-        
-        print("After adding gaussian noise, {} train data".format(self.train_n))
 
+        print("After adding gaussian noise, {} train data".format(self.train_n))
 
     def gan_generator(self, padding="Same"):
         idx = np.random.randint(0, self.gan_data.shape[0], self._hypo_train_x.shape[0])
@@ -289,6 +292,7 @@ def main():
     # data.gaussian_noise(num_augmentations=3, padding="History")
     data.mixup(padding="History")
     data.render_data()
+
 
 if __name__ == "__main__":
     main()

@@ -62,8 +62,8 @@ def build_dataset(
         
         print(f"Patient {pid} has {len(train_data[pid])} entries.")
 
-    # a dumb dataset instance
-    train_dataset = CGMSDataSeg("OH", "data/00897741_entries__to_2018-02-01.json", 5)
+    # a dumb dataset instance with first file of data_dir
+    train_dataset = CGMSDataSeg("OH", files[0], 5)
     print(len(train_dataset.data))  # Check length before
     train_pids = set(ids) - set(test_ids)
     local_train_data = []

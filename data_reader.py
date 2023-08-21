@@ -43,7 +43,6 @@ class DataReader:
                     t0 = parser.parse(data[i - 1]["dateString"]).replace(tzinfo=None)
                 except (KeyError, ParserError):
                     # skip one reading if 'dateString' is not present or in wrong format
-                    res.append([])
                     continue
                 
                 delt = t1 - t0
@@ -54,7 +53,11 @@ class DataReader:
                     value = data[i].get(
                         "mbg", None
                     )  # If 'mbg' is also not present, it will assign None.
-
+                
+                # Check if value is an empty string and set it to None
+                if value == '':
+                    value = None
+                    
                 if delt <= self.interval_timedelta:
                     if value is not None:
                         res[-1].append(value)

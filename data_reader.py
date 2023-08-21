@@ -1,6 +1,8 @@
 import json
 import datetime
 from dateutil import parser
+from dateutil.parser import ParserError
+
 
 
 class DataReader:
@@ -23,29 +25,41 @@ class DataReader:
 
         # Since data is in descending order, reverse it to process sequentially
         data.reverse()
-
-        # Initialize with the first reading
-        res.append([data[0]["sgv"]])
-
-        for i in range(1, len(data)):
-            # print(data[i]['dateString'])
-            t1 = parser.parse(data[i]["dateString"])
-            t0 = parser.parse(data[i - 1]["dateString"])
-
-            delt = t1 - t0
-
-            try:
-                value = data[i]["sgv"]
-            except KeyError:
-                value = data[i].get(
+        try:
+            value_0 = data[0]["sgv"]
+        except KeyError:
+            value_0 = data[0].get(
                     "mbg", None
-                )  # If 'mbg' is also not present, it will assign None.
+                )
 
-            if delt <= self.interval_timedelta:
-                if value is not None:
-                    res[-1].append(value)
-            else:
-                if value is not None:
-                    res.append([value])
+        if value_0 is not None:
+            # Initialize with the first reading
+            res.append([value_0])
+
+            for i in range(1, len(data)):
+                # print(data[i]['dateString'])
+                try:
+                    t1 = parser.parse(data[i]["dateString"]).replace(tzinfo=None)
+                    t0 = parser.parse(data[i - 1]["dateString"]).replace(tzinfo=None)
+                except (KeyError, ParserError):
+                    # skip one reading if 'dateString' is not present or in wrong format
+                    res.append([])
+                    continue
+                
+                delt = t1 - t0
+
+                try:
+                    value = data[i]["sgv"]
+                except KeyError:
+                    value = data[i].get(
+                        "mbg", None
+                    )  # If 'mbg' is also not present, it will assign None.
+
+                if delt <= self.interval_timedelta:
+                    if value is not None:
+                        res[-1].append(value)
+                else:
+                    if value is not None:
+                        res.append([value])
 
         return res

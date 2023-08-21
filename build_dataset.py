@@ -9,6 +9,7 @@ from data_reader import DataReader
 
 
 def build_dataset(
+    data_dir,
     ids,
     test_ids,
     sampling_horizon,
@@ -29,9 +30,9 @@ def build_dataset(
     for pid in ids:
         # take all json files beginning with {pid}_entries
         file = [   
-            os.path.join("data", f)
-            for f in os.listdir("data")
-            if os.path.isfile(os.path.join("data", f))
+            os.path.join(data_dir , f)
+            for f in os.listdir(data_dir)
+            if os.path.isfile(os.path.join(data_dir, f))
             and f.startswith(pid + "_entries")
             and f.endswith(".json")
         ]
@@ -100,6 +101,7 @@ def main(data_config):
     with open(data_config, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
+    data_dir = config["data_dir"]
     ids = config["ids"]
     test_ids = config["test_ids"]
     sampling_horizon = config["sampling_horizon"]
@@ -114,6 +116,7 @@ def main(data_config):
     augmentation_params = config["augmentation_params"]
 
     data, targets = build_dataset(
+        data_dir,
         ids,
         test_ids,
         sampling_horizon,
@@ -128,6 +131,9 @@ def main(data_config):
         augmentation_params,
     )
 
+    # save data and targets as numpy arrays, in same file
+    dataset = np.array([data, targets])
+    np.save("data/dataset.npy", dataset)
     # dataset = tf.data.Dataset.from_tensor_slices((data, targets))
     # save
     # dataset.save("data/dataset")

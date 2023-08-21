@@ -93,7 +93,11 @@ class CGMSDataSeg(CGMSData):
                 c = x.shape[0]
         self._original_train_x = x[0:c]
         self._original_train_y = y[0:c]
+        # cast as float32, some strange error when processing the whole dataset
+        self._original_train_x = self._original_train_x.astype(np.float32)
+        self._original_train_y = self._original_train_y.astype(np.float32)
         # detect hypo in training data
+        print("Shape of original train data: ", self._original_train_y.shape)
         if padding == "Same":
             hypo_loc = np.where(self._original_train_y[:, 0] < self._hypo_th)
             border_loc = np.where(
@@ -107,6 +111,13 @@ class CGMSDataSeg(CGMSData):
             )
             nonhypo_loc = np.where(self._original_train_y >= self._hypo_th)
         elif padding == "History":
+            print(type(self._original_train_y[:, -1]), type(self._hypo_th))
+            print(self._original_train_y[:, -1].shape)
+            print(self._original_train_y[:, -1])
+            print(self._hypo_th)
+            print(np.any(np.isnan(self._original_train_y)))
+            print(np.any(np.isinf(self._original_train_y)))
+
             hypo_loc = np.where(self._original_train_y[:, -1] < self._hypo_th)
             border_loc = np.where(
                 np.abs(self._original_train_y[:, -1] - self._hypo_th) < self._border_th

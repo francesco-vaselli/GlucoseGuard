@@ -132,7 +132,7 @@ def main(data_config):
     )
 
     # save data and targets as numpy arrays, in same file
-    dataset = np.array([data, targets])
+    dataset = np.concatenate((data, targets), axis=1)
     np.save("data/dataset.npy", dataset)
     # dataset = tf.data.Dataset.from_tensor_slices((data, targets))
     # save

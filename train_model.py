@@ -49,8 +49,8 @@ def train(
     model_config,
 ):
     # 1. Load the data
-    train_x = np.load(data_path)[0]
-    train_y = np.load(data_path)[1]
+    train_x = np.load(data_path)[:, :7]
+    train_y = np.load(data_path)[:, 7:]
     print("train_x shape:", train_x.shape)
 
     # Ensure that train_x has the right shape [samples, timesteps, features]

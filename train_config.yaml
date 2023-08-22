@@ -1,0 +1,18 @@
+data_path: "./data/dataset.npy"
+batch_size: 128
+buffer_size: 1000 # not used
+epochs: 200
+optimizer: "adam"
+loss: "mse"
+learning_rate: 0.001
+model_config:
+  model_type: "cnn"
+  cnn_config:
+    n_conv_layers: 2
+    filters: 64
+    kernel_size: 3
+    activation: "relu"
+    input_shape: [7, 1]
+    n_dense_layers: 3
+    dense_size: 64
+    output_shape: 6

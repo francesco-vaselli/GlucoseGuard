@@ -117,6 +117,8 @@ def main():
 
     train(
         data_path,
+        n_train,
+        n_val,
         batch_size,
         buffer_size,
         epochs,

@@ -107,6 +107,8 @@ def main():
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     data_path = config["data_path"]
+    n_train = config["n_train"]
+    n_val = config["n_val"]
     batch_size = config["batch_size"]
     buffer_size = config["buffer_size"]
     epochs = config["epochs"]

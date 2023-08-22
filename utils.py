@@ -148,13 +148,22 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
         # Get predictions
         x, y_true = self.val_data
         y_pred = self.model.predict(x[: self.num_samples])
+        time_intervals = np.arange(0, 5 * x[0].shape[0], 5)
 
         # Create figures and log them
         for i in range(self.num_samples):
-            fig, ax = plt.subplots()
-            ax.plot(x[i], label="Input TS")
-            ax.scatter(range(len(y_true[i])), y_true[i], marker="o", label="True")
-            ax.scatter(range(len(y_pred[i])), y_pred[i], marker="x", label="Predicted")
+            fig, ax = plt.subplots(figsize=(12, 6))
+
+            # Plot input time series
+            ax.plot(time_intervals, x[i].flatten(), label="Input Sequence")
+
+            # Plot true and predicted outputs
+            ax.scatter(time_intervals, y_true[i], s=100, c='r', label="True")
+            ax.scatter(time_intervals, y_pred[i], s=100, c='g', marker='X', label="Predicted")
+
+            ax.set_title(f"Example {i+1}")
+            ax.set_xlabel("Time (minutes)")
+            ax.set_ylabel("Value")
             ax.legend()
 
             with self.writer.as_default():

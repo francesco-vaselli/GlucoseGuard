@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, Flatten, Dense
+from tensorflow.keras.callbacks import TensorBoard
+import datetime
+
+from utils import CustomImageLogging, ClassificationMetrics
 
 
 def build_model(model_config):
@@ -13,23 +17,27 @@ def build_model(model_config):
 
         # Add convolutional layers
         for _ in range(cnn_config["n_conv_layers"]):
-            model.add(Conv1D(
-                filters=cnn_config["filters"],
-                kernel_size=cnn_config["kernel_size"],
-                activation=cnn_config["activation"],
-                input_shape=cnn_config["input_shape"],
-            ))
+            model.add(
+                Conv1D(
+                    filters=cnn_config["filters"],
+                    kernel_size=cnn_config["kernel_size"],
+                    activation=cnn_config["activation"],
+                    input_shape=cnn_config["input_shape"],
+                )
+            )
 
         # Add flatten layer
         model.add(Flatten())
 
         # Add dense layers
         for _ in range(cnn_config["n_dense_layers"]):
-            model.add(Dense(cnn_config["dense_size"], activation=cnn_config["activation"]))
+            model.add(
+                Dense(cnn_config["dense_size"], activation=cnn_config["activation"])
+            )
 
         # Add output layer
         model.add(Dense(cnn_config["output_shape"]))
-        print("CNN model built:", '\n', model.summary())
+        print("CNN model built:", "\n", model.summary())
     else:
         raise NotImplementedError(f"{model_config['model_type']} not implemented")
 
@@ -40,6 +48,7 @@ def train(
     data_path,
     n_train,
     n_val,
+    n_test,
     batch_size,
     buffer_size,
     epochs,
@@ -65,6 +74,7 @@ def train(
     dataset = tf.data.Dataset.from_tensor_slices((train_x, train_y))
     train_dataset = dataset.take(n_train)
     val_dataset = dataset.skip(n_train).take(n_val)
+    test_dataset = dataset.skip(n_train + n_val).take(n_test)
 
     train_dataset = (
         train_dataset.shuffle(
@@ -80,8 +90,15 @@ def train(
     model.compile(
         optimizer="adam", loss="mse"
     )  # Using Mean Squared Error for regression tasks
-
+    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
+    # After setting up your train_dataset and val_dataset
+    val_samples = next(iter(val_dataset.batch(3)))
+    image_logging_callback = CustomImageLogging(log_dir, val_samples)
     # Training the model with reducelronplateau callback and early stopping
+    classification_metrics_callback = ClassificationMetrics(
+        test_dataset, log_dir, threshold=80
+    )
     EPOCHS = epochs
     history = model.fit(
         train_dataset,
@@ -92,6 +109,9 @@ def train(
                 monitor="val_loss", factor=0.2, patience=5, min_lr=0.00001
             ),
             tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
+            tensorboard_callback,
+            image_logging_callback,
+            classification_metrics_callback,
         ],
     )
     # plot the loss
@@ -110,6 +130,7 @@ def main():
     data_path = config["data_path"]
     n_train = config["n_train"]
     n_val = config["n_val"]
+    n_test = config["n_test"]
     batch_size = config["batch_size"]
     buffer_size = config["buffer_size"]
     epochs = config["epochs"]
@@ -122,6 +143,7 @@ def main():
         data_path,
         n_train,
         n_val,
+        n_test,
         batch_size,
         buffer_size,
         epochs,
@@ -130,6 +152,7 @@ def main():
         learning_rate,
         model_config,
     )
+
 
 if __name__ == "__main__":
     main()

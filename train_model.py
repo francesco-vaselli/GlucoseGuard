@@ -95,9 +95,22 @@ def train(
 
     # 3. Define the 1D CNN model for regression
     model = build_model(model_config)
-
+    if optimizer == "adam":
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+    elif optimizer == "sgd":
+        optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate)
+    else:
+        raise NotImplementedError(f"{optimizer} not implemented")
+    
+    if loss == "mse":
+        loss = tf.keras.losses.MeanSquaredError()
+    elif loss == "mae":
+        loss = tf.keras.losses.MeanAbsoluteError()
+    else:
+        raise NotImplementedError(f"{loss} not implemented")
+    
     model.compile(
-        optimizer="adam", loss="mse"
+        optimizer=optimizer, loss=loss
     )  # Using Mean Squared Error for regression tasks
     log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)

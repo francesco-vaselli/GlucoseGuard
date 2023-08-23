@@ -74,19 +74,17 @@ def train(
     # 1. Load the data
     data = np.load(data_path)
     train_x = torch.tensor(data[:n_train, :7], dtype=torch.float32).view(-1, 1, 7)
-    train_y = torch.tensor(data[:n_train, 7:], dtype=torch.float32).view(-1, 1, 6)
+    train_y = torch.tensor(data[:n_train, 7:], dtype=torch.float32)
     val_x = torch.tensor(data[n_train : n_train + n_val, :7], dtype=torch.float32).view(
         -1, 1, 7
     )
-    val_y = torch.tensor(data[n_train : n_train + n_val, 7:], dtype=torch.float32).view(
-        -1, 1, 6
-    )
+    val_y = torch.tensor(data[n_train : n_train + n_val, 7:], dtype=torch.float32)
     test_x = torch.tensor(
         data[n_train + n_val : n_train + n_val + n_test, :7], dtype=torch.float32
     ).view(-1, 1, 7)
     test_y = torch.tensor(
         data[n_train + n_val : n_train + n_val + n_test, 7:], dtype=torch.float32
-    ).view(-1, 1, 6)
+    )
 
     # 2. Build the dataset
     train_dataset = TensorDataset(train_x, train_y)

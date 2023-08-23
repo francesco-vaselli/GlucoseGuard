@@ -133,21 +133,21 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
 
 
 class CustomImageLogging(tf.keras.callbacks.Callback):
-    def __init__(self, log_dir, val_data, num_samples=3):
+    def __init__(self, log_dir, val_dataset, num_samples=3):
         super().__init__()
         self.log_dir = log_dir
-        self.val_data = val_data
+        self.val_data = val_dataset.take(num_samples)
         self.num_samples = num_samples
         self.writer = tf.summary.create_file_writer(self.log_dir)
 
     def on_epoch_end(self, epoch, logs=None):
-        if (
-            epoch % 5 != 4
-        ):  # Here we check if the epoch is a multiple of 5 (adjust if 0-indexing is confusing)
-            return
+        # if (
+        #     epoch % 5 != 4
+        # ):  # Here we check if the epoch is a multiple of 5 (adjust if 0-indexing is confusing)
+        #    return
         # Get predictions
         x, y_true = self.val_data
-        y_pred = self.model.predict(x[: self.num_samples])
+        y_pred = self.model.predict(x)
         time_intervals = np.arange(0, 5 * x[0].shape[0], 5)
 
         # Create figures and log them

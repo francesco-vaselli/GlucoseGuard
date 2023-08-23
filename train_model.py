@@ -115,8 +115,7 @@ def train(
     log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
     # After setting up your train_dataset and val_dataset
-    val_samples = next(iter(val_dataset.batch(3)))
-    image_logging_callback = CustomImageLogging(log_dir, val_samples)
+    image_logging_callback = CustomImageLogging(log_dir, val_dataset)
     # Training the model with reducelronplateau callback and early stopping
     classification_metrics_callback = ClassificationMetrics(
         test_dataset, log_dir, threshold=80

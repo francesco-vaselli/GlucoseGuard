@@ -5,6 +5,13 @@ import numpy as np
 from sklearn.metrics import confusion_matrix, roc_curve, auc
 import itertools
 
+def filter_stationary_sequences_dataset(ds):
+
+    mask = np.ones(len(ds), dtype=bool)
+    std = np.std(ds, axis=1)
+    mask[std == 0] = False
+
+    return ds[mask]
 
 def plot_confusion_matrix(cm, class_names):
     figure = plt.figure(figsize=(8, 8))
@@ -21,7 +28,7 @@ def plot_confusion_matrix(cm, class_names):
     # Use white text if squares are dark; otherwise black.
     threshold = cm.max() / 2.0
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        color = "white" if cm[i, j] > threshold else "black"
+        color = "black"
         plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
 
     plt.tight_layout()

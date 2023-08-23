@@ -7,7 +7,11 @@ from tensorflow.keras.layers import Conv1D, Flatten, Dense
 from tensorflow.keras.callbacks import TensorBoard
 import datetime
 
-from utils import CustomImageLogging, ClassificationMetrics
+from utils import (
+    CustomImageLogging,
+    ClassificationMetrics,
+    filter_stationary_sequences_dataset,
+)
 
 
 def build_model(model_config):
@@ -58,12 +62,14 @@ def train(
     model_config,
 ):
     # 1. Load the data
-    train_x = np.load(data_path)[:n_train, :7]
-    train_y = np.load(data_path)[:n_train, 7:]
-    val_x = np.load(data_path)[n_train : n_train + n_val, :7]
-    val_y = np.load(data_path)[n_train : n_train + n_val, 7:]
-    test_x = np.load(data_path)[n_train + n_val : n_train + n_val + n_test, :7]
-    test_y = np.load(data_path)[n_train + n_val : n_train + n_val + n_test, 7:]
+    ds = np.load(data_path)
+    ds = filter_stationary_sequences_dataset(ds)
+    train_x = ds[:n_train, :7]
+    train_y = ds[:n_train, 7:]
+    val_x = ds[n_train : n_train + n_val, :7]
+    val_y = ds[n_train : n_train + n_val, 7:]
+    test_x = ds[n_train + n_val : n_train + n_val + n_test, :7]
+    test_y = ds[n_train + n_val : n_train + n_val + n_test, 7:]
     print("train_x shape:", train_x.shape)
 
     # Ensure that train_x has the right shape [samples, timesteps, features]
@@ -88,7 +94,7 @@ def train(
         .batch(BATCH_SIZE)
         .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     )
-    val_dataset = val_dataset.batch(BATCH_SIZE) 
+    val_dataset = val_dataset.batch(BATCH_SIZE)
     # get one element from the val dataset and print its shape
     print("val_dataset shape:", next(iter(val_dataset.batch(1)))[0].shape)
     test_dataset = test_dataset.batch(BATCH_SIZE)
@@ -101,14 +107,14 @@ def train(
         optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate)
     else:
         raise NotImplementedError(f"{optimizer} not implemented")
-    
+
     if loss == "mse":
         loss = tf.keras.losses.MeanSquaredError()
     elif loss == "mae":
         loss = tf.keras.losses.MeanAbsoluteError()
     else:
         raise NotImplementedError(f"{loss} not implemented")
-    
+
     model.compile(
         optimizer=optimizer, loss=loss
     )  # Using Mean Squared Error for regression tasks
@@ -118,7 +124,7 @@ def train(
     image_logging_callback = CustomImageLogging(log_dir, val_dataset)
     # Training the model with reducelronplateau callback and early stopping
     classification_metrics_callback = ClassificationMetrics(
-        test_dataset, log_dir, test_y=test_y ,threshold=80
+        test_dataset, log_dir, test_y=test_y, threshold=80
     )
     EPOCHS = epochs
     history = model.fit(

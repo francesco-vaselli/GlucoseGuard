@@ -104,15 +104,15 @@ def train(
         train_dataset,
         epochs=EPOCHS,
         validation_data=val_dataset,
-        callbacks=[
-            tf.keras.callbacks.ReduceLROnPlateau(
-                monitor="val_loss", factor=0.2, patience=5, min_lr=0.00001
-            ),
-            tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
-            tensorboard_callback,
-            image_logging_callback,
-            classification_metrics_callback,
-        ],
+        # callbacks=[
+        #     tf.keras.callbacks.ReduceLROnPlateau(
+        #         monitor="val_loss", factor=0.2, patience=5, min_lr=0.00001
+        #     ),
+        #     tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
+        #     tensorboard_callback,
+        #     image_logging_callback,
+        #     classification_metrics_callback,
+        # ],
     )
     # plot the loss
 

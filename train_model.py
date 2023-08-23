@@ -74,6 +74,9 @@ def train(
     dataset = tf.data.Dataset.from_tensor_slices((train_x, train_y))
     train_dataset = dataset.take(n_train)
     val_dataset = dataset.skip(n_train).take(n_val)
+    # print the shape of the dataset
+    print("train_dataset shape:", train_dataset)
+    print("val_dataset shape:", val_dataset)
     test_dataset = dataset.skip(n_train + n_val).take(n_test)
 
     train_dataset = (

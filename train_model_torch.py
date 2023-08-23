@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import yaml
 
 
@@ -137,10 +137,10 @@ def train(
         print(f"\tValidation Loss: {avg_val_loss}")
 
     # Plot the loss
-    plt.plot(train_loss, label="train")
-    plt.plot(val_loss, label="val")
-    plt.legend()
-    plt.savefig("loss.png")
+    # plt.plot(train_loss, label="train")
+    # plt.plot(val_loss, label="val")
+    # plt.legend()
+    # plt.savefig("loss.png")
 
 
 def main():

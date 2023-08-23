@@ -42,7 +42,7 @@ class CNNModel(nn.Module):
     def calculate_flattened_size(self, config):
         # You will need to calculate the size of the data after it's been through the conv layers
         # This is a simplified example and might need to be adapted based on your specific architecture
-        size = config["input_shape"][-1]
+        size = 7
         for _ in range(config["n_conv_layers"]):
             size = size - config["kernel_size"] + 1
             size = size // config["stride"] if "stride" in config else size

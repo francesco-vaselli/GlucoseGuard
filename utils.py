@@ -155,7 +155,7 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
             fig, ax = plt.subplots(figsize=(12, 6))
 
             # Plot input time series
-            ax.plot(time_intervals, x[i].flatten(), label="Input Sequence")
+            ax.plot(time_intervals, x[i], label="Input Sequence")
 
             # Plot true and predicted outputs
             ax.scatter(time_intervals, y_true[i], s=100, c='r', label="True")

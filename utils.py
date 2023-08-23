@@ -84,6 +84,7 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
         # ):  # Here we check if the epoch is a multiple of 5 (adjust if 0-indexing is confusing)
         #     return
         y_pred = self.model.predict(self.val_data)
+        y_true = self.test_y
 
         true_label, pred_label, fpr, tpr, roc_auc = check_classification(
             y_true, y_pred, self.threshold

@@ -136,7 +136,7 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
     def __init__(self, log_dir, val_dataset, num_samples=3):
         super().__init__()
         self.log_dir = log_dir
-        self.val_data = val_dataset.take(num_samples)
+        self.val_data = val_dataset
         self.num_samples = num_samples
         self.writer = tf.summary.create_file_writer(self.log_dir)
 
@@ -147,7 +147,7 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
         #    return
         # Get predictions
         x, y_true = self.val_data
-        y_pred = self.model.predict(x)
+        y_pred = self.model.predict(x[: self.num_samples])
         time_intervals = np.arange(0, 5 * x[0].shape[0], 5)
 
         # Create figures and log them

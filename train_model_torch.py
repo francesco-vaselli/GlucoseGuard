@@ -133,6 +133,7 @@ def train(
                 y_pred = model(x_batch)
                 loss = criterion(y_pred, y_batch)
                 val_loss.append(loss.item())
+                val_loss_total += loss.item()
         avg_val_loss = val_loss_total / len(val_loader)
         print(f"\tValidation Loss: {avg_val_loss}")
 

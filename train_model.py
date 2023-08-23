@@ -118,7 +118,7 @@ def train(
     image_logging_callback = CustomImageLogging(log_dir, val_dataset)
     # Training the model with reducelronplateau callback and early stopping
     classification_metrics_callback = ClassificationMetrics(
-        test_dataset, log_dir, threshold=80
+        test_dataset, log_dir, test_y=test_y ,threshold=80
     )
     EPOCHS = epochs
     history = model.fit(

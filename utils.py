@@ -71,11 +71,12 @@ def check_classification(true, pred, threshold=80, standard=True, ind=5):
 
 
 class ClassificationMetrics(tf.keras.callbacks.Callback):
-    def __init__(self, val_data, log_dir, threshold=80):
+    def __init__(self, val_data, log_dir, test_y, threshold=80):
         super().__init__()
         self.val_data = val_data
         self.threshold = threshold
         self.writer = tf.summary.create_file_writer(log_dir)
+        self.test_y = None
 
     def on_epoch_end(self, epoch, logs=None):
         # if (
@@ -83,7 +84,6 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
         # ):  # Here we check if the epoch is a multiple of 5 (adjust if 0-indexing is confusing)
         #     return
         y_pred = self.model.predict(self.val_data)
-        y_true = np.concatenate([y.numpy() for _, y in self.val_data.unbatch()], axis=0)
 
         true_label, pred_label, fpr, tpr, roc_auc = check_classification(
             y_true, y_pred, self.threshold

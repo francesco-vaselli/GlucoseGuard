@@ -78,10 +78,10 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
         self.writer = tf.summary.create_file_writer(log_dir)
 
     def on_epoch_end(self, epoch, logs=None):
-        if (
-            epoch % 5 != 4
-        ):  # Here we check if the epoch is a multiple of 5 (adjust if 0-indexing is confusing)
-            return
+        # if (
+        #     epoch % 5 != 4
+        # ):  # Here we check if the epoch is a multiple of 5 (adjust if 0-indexing is confusing)
+        #     return
         x, y_true = self.val_data
         y_pred = self.model.predict(x)
 

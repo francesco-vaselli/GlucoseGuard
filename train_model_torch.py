@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 import yaml
 
 class CNNModel(nn.Module):
-    def __init__(self, config):
+    def __init__(self, gen_config):
         super(CNNModel, self).__init__()
+        config = gen_config["cnn_config"]
         self.convs = nn.Sequential(
             *[nn.Conv1d(config["input_shape"][0], config["filters"], config["kernel_size"], activation=config["activation"]) for _ in range(config["n_conv_layers"])]
         )

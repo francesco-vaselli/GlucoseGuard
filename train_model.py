@@ -58,27 +58,32 @@ def train(
     model_config,
 ):
     # 1. Load the data
-    train_x = np.load(data_path)[:, :7]
-    train_y = np.load(data_path)[:, 7:]
+    train_x = np.load(data_path)[:n_train, :7]
+    train_y = np.load(data_path)[:n_train, 7:]
+    val_x = np.load(data_path)[n_train : n_train + n_val, :7]
+    val_y = np.load(data_path)[n_train : n_train + n_val, 7:]
+    test_x = np.load(data_path)[n_train + n_val : n_train + n_val + n_test, :7]
+    test_y = np.load(data_path)[n_train + n_val : n_train + n_val + n_test, 7:]
     print("train_x shape:", train_x.shape)
 
     # Ensure that train_x has the right shape [samples, timesteps, features]
     # for the moment this stays
     if len(train_x.shape) == 2:
         train_x = np.expand_dims(train_x, axis=-1)
+        val_x = np.expand_dims(val_x, axis=-1)
+        test_x = np.expand_dims(test_x, axis=-1)
 
     # 2. Build the dataset
     BATCH_SIZE = batch_size
     BUFFER_SIZE = buffer_size
 
-    dataset = tf.data.Dataset.from_tensor_slices((train_x, train_y))
-    train_dataset = dataset.take(n_train)
-    val_dataset = dataset.skip(n_train).take(n_val)
-    test_dataset = dataset.skip(n_train + n_val).take(n_test)
+    train_dataset = tf.data.Dataset.from_tensor_slices((train_x, train_y))
+    val_dataset = tf.data.Dataset.from_tensor_slices((val_x, val_y))
+    test_dataset = tf.data.Dataset.from_tensor_slices((test_x, test_y))
 
     train_dataset = (
         train_dataset.shuffle(
-            dataset.cardinality()
+            train_dataset.cardinality()
         )  # shuffle all as it is a small dataset
         .batch(BATCH_SIZE)
         .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)

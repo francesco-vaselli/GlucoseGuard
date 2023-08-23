@@ -10,14 +10,32 @@ class CNNModel(nn.Module):
     def __init__(self, gen_config):
         super(CNNModel, self).__init__()
         config = gen_config["cnn_config"]
-        self.convs = nn.Sequential(
-            *[nn.Conv1d(config["input_shape"][0], config["filters"], config["kernel_size"], activation=config["activation"]) for _ in range(config["n_conv_layers"])]
-        )
+
+        conv_layers = []
+        for _ in range(config["n_conv_layers"]):
+            conv_layers.append(nn.Conv1d(config["input_shape"][0], config["filters"], config["kernel_size"]))
+            conv_layers.append(self.get_activation(config["activation"]))
+
+        self.convs = nn.Sequential(*conv_layers)
         self.flatten = nn.Flatten()
-        self.denses = nn.Sequential(
-            *[nn.Linear(config["dense_size"], config["dense_size"], activation=config["activation"]) for _ in range(config["n_dense_layers"])]
-        )
+
+        dense_layers = []
+        for _ in range(config["n_dense_layers"]):
+            dense_layers.append(nn.Linear(config["dense_size"], config["dense_size"]))
+            dense_layers.append(self.get_activation(config["activation"]))
+
+        self.denses = nn.Sequential(*dense_layers)
         self.output = nn.Linear(config["dense_size"], config["output_shape"])
+
+    def get_activation(self, activation_name):
+        if activation_name == "relu":
+            return nn.ReLU()
+        elif activation_name == "tanh":
+            return nn.Tanh()
+        elif activation_name == "sigmoid":
+            return nn.Sigmoid()
+        else:
+            raise ValueError(f"Unknown activation function: {activation_name}")
 
     def forward(self, x):
         x = self.convs(x)
@@ -25,6 +43,7 @@ class CNNModel(nn.Module):
         x = self.denses(x)
         x = self.output(x)
         return x
+
 
 def train(data_path, n_train, n_val, n_test, batch_size, epochs, learning_rate, model_config):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

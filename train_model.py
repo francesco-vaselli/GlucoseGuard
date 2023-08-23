@@ -74,9 +74,6 @@ def train(
     dataset = tf.data.Dataset.from_tensor_slices((train_x, train_y))
     train_dataset = dataset.take(n_train)
     val_dataset = dataset.skip(n_train).take(n_val)
-    # print the shape of the dataset
-    print("train_dataset shape:", train_dataset, len(train_dataset))
-    print("val_dataset shape:", val_dataset, len(val_dataset))
     test_dataset = dataset.skip(n_train + n_val).take(n_test)
 
     train_dataset = (
@@ -86,6 +83,8 @@ def train(
         .batch(BATCH_SIZE)
         .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     )
+    val_dataset = val_dataset.batch(BATCH_SIZE) 
+    test_dataset = test_dataset.batch(BATCH_SIZE)
 
     # 3. Define the 1D CNN model for regression
     model = build_model(model_config)
@@ -106,16 +105,16 @@ def train(
     history = model.fit(
         train_dataset,
         epochs=EPOCHS,
-        validation_data=val_dataset,
-        # callbacks=[
-        #     tf.keras.callbacks.ReduceLROnPlateau(
-        #         monitor="val_loss", factor=0.2, patience=5, min_lr=0.00001
-        #     ),
-        #     tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
-        #     tensorboard_callback,
-        #     image_logging_callback,
-        #     classification_metrics_callback,
-        # ],
+        validation_data=val_dataset.batch(BATCH_SIZE),
+        callbacks=[
+            tf.keras.callbacks.ReduceLROnPlateau(
+                monitor="val_loss", factor=0.2, patience=5, min_lr=0.00001
+            ),
+            tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
+            tensorboard_callback,
+            image_logging_callback,
+            classification_metrics_callback,
+        ],
     )
     # plot the loss
 

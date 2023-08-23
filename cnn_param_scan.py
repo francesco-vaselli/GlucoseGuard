@@ -6,6 +6,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, Flatten, Dense
 from tensorflow.keras.callbacks import TensorBoard
 import datetime
+import keras_tuner as kt
 
 from utils import (
     CustomImageLogging,
@@ -14,36 +15,43 @@ from utils import (
 )
 
 
-def build_model(model_config):
-    if model_config["model_type"] == "cnn":
-        cnn_config = model_config["cnn_config"]
-        model = Sequential()
+def build_model(hp):
+    model = Sequential()
 
-        # Add convolutional layers
-        for _ in range(cnn_config["n_conv_layers"]):
-            model.add(
-                Conv1D(
-                    filters=cnn_config["filters"],
-                    kernel_size=cnn_config["kernel_size"],
-                    activation=cnn_config["activation"],
-                    input_shape=cnn_config["input_shape"],
-                )
+    filter_units = hp.Int("units", min_value=32, max_value=512, step=32)
+    kernel_size = hp.Choice("learning_rate", values=[1, 2, 3, 4])
+    dense_units = hp.Int("units", min_value=32, max_value=512, step=32)
+    n_conv_layers = hp.Int("units", min_value=1, max_value=6, step=1)
+    n_dense_layers = hp.Int("units", min_value=1, max_value=6, step=1)
+    learning_rate = hp.Choice("learning_rate", values=[1e-1, 1e-2, 1e-3, 1e-4])
+
+    # Add convolutional layers
+    for _ in range(n_conv_layers):
+        model.add(
+            Conv1D(
+                filters=filter_units,
+                kernel_size=kernel_size,
+                activation="relu",
+                input_shape=[7, 1],
             )
+        )
 
-        # Add flatten layer
-        model.add(Flatten())
+    # Add flatten layer
+    model.add(Flatten())
 
-        # Add dense layers
-        for _ in range(cnn_config["n_dense_layers"]):
-            model.add(
-                Dense(cnn_config["dense_size"], activation=cnn_config["activation"])
-            )
+    # Add dense layers
+    for _ in range(n_dense_layers):
+        model.add(Dense(dense_units, activation="relu"))
 
-        # Add output layer
-        model.add(Dense(cnn_config["output_shape"]))
-        print("CNN model built:", "\n", model.summary())
-    else:
-        raise NotImplementedError(f"{model_config['model_type']} not implemented")
+    # Add output layer
+    model.add(Dense(6))
+    # print("CNN model built:", "\n", model.summary())
+
+    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+
+    loss = tf.keras.losses.MeanAbsoluteError()
+
+    model.compile(optimizer=optimizer, loss=loss)
 
     return model
 
@@ -98,55 +106,33 @@ def train(
     # get one element from the val dataset and print its shape
     print("val_dataset shape:", next(iter(val_dataset.batch(1)))[0].shape)
     test_dataset = test_dataset.batch(BATCH_SIZE)
-
-    # 3. Define the 1D CNN model for regression
-    model = build_model(model_config)
-    if optimizer == "adam":
-        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
-    elif optimizer == "sgd":
-        optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate)
-    else:
-        raise NotImplementedError(f"{optimizer} not implemented")
-
-    if loss == "mse":
-        loss = tf.keras.losses.MeanSquaredError()
-    elif loss == "mae":
-        loss = tf.keras.losses.MeanAbsoluteError()
-    else:
-        raise NotImplementedError(f"{loss} not implemented")
-
-    model.compile(
-        optimizer=optimizer, loss=loss
-    )  # Using Mean Squared Error for regression tasks
-    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
-    # After setting up your train_dataset and val_dataset
-    image_logging_callback = CustomImageLogging(log_dir, val_dataset)
-    # Training the model with reducelronplateau callback and early stopping
-    classification_metrics_callback = ClassificationMetrics(
-        test_dataset, log_dir, test_y=test_y, threshold=80
-    )
     EPOCHS = epochs
-    history = model.fit(
-        train_dataset,
+
+    # Using Mean Squared Error for regression tasks
+    tuner = kt.Hyperband(
+        build_model,
+        objective="val_loss",
+        max_epochs=EPOCHS,
+        factor=3,
+        directory="logs",
+        project_name="cnn_optim",
+    )
+    stop_early = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=5)
+    reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
+        monitor="val_loss", factor=0.2, patience=5, min_lr=0.0001
+    )
+    tuner.search(train_dataset,
         epochs=EPOCHS,
         validation_data=val_dataset,
-        callbacks=[
-            tf.keras.callbacks.ReduceLROnPlateau(
-                monitor="val_loss", factor=0.5, patience=5, min_lr=0.00001
-            ),
-            tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
-            tensorboard_callback,
-            image_logging_callback,
-            classification_metrics_callback,
-        ],
-    )
-    # plot the loss
+        callbacks=[stop_early, reduce_lr])
 
-    plt.plot(history.history["loss"], label="train")
-    plt.plot(history.history["val_loss"], label="val")
-    plt.legend()
-    plt.savefig("loss.png")
+    # Get the optimal hyperparameters
+    best_hps=tuner.get_best_hyperparameters(num_trials=1)[0]
+
+    print(f"""
+    The hyperparameter search is complete. The best params are:
+          {best_hps}
+    """)
 
 
 def main():

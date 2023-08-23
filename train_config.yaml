@@ -7,7 +7,7 @@ buffer_size: 1000 # not used
 epochs: 200
 optimizer: "adam"
 loss: "mse"
-learning_rate: 0.001
+learning_rate: 0.005
 model_config:
   model_type: "cnn"
   cnn_config:

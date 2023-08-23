@@ -84,8 +84,8 @@ def train(
         .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     )
     val_dataset = val_dataset.batch(BATCH_SIZE) 
-    # get one element from the test dataset and print its shape
-    print("test_dataset shape:", next(iter(test_dataset.batch(1)))[0].shape)
+    # get one element from the val dataset and print its shape
+    print("val_dataset shape:", next(iter(val_dataset.batch(1)))[0].shape)
     test_dataset = test_dataset.batch(BATCH_SIZE)
 
     # 3. Define the 1D CNN model for regression

@@ -76,7 +76,7 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
         self.val_data = val_data
         self.threshold = threshold
         self.writer = tf.summary.create_file_writer(log_dir)
-        self.test_y = None
+        self.test_y = test_y
 
     def on_epoch_end(self, epoch, logs=None):
         # if (

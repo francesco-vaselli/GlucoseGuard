@@ -84,7 +84,6 @@ def build_rnn_model(hp):
             tf.keras.layers.LSTM(
                 units=rnn_units,
                 return_sequences=return_sequences,
-                input_shape=[7, 1] if i == 0 else None,
             )
         )
 

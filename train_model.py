@@ -22,7 +22,8 @@ class FeedBack(tf.keras.Model):
         super().__init__()
         self.out_steps = out_steps
         self.units = units
-        self.lstm_cells = [tf.keras.layers.LSTMCell(unit_size) for _ in range(units)]
+        self.first_lstm_cell = tf.keras.layers.LSTMCell(unit_size, input_shape=(7, 1))
+        self.lstm_cells = [self.first_lstm_cell]+[tf.keras.layers.LSTMCell(unit_size) for _ in range(units-1)]
         self.lstm_rnn = tf.keras.layers.RNN(self.lstm_cells, return_state=True)
         self.dense_layers = [
             tf.keras.layers.Dense(dense_size, activation="relu")

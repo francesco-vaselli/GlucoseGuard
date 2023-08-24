@@ -19,23 +19,30 @@ def build_model(hp):
     model = Sequential()
 
     filter_units = hp.Int("filter_units", min_value=32, max_value=512, step=32)
-    kernel_size = hp.Choice("kernel_size", values=[1, 2, 3, 4])
+    kernel_size = hp.Choice("kernel_size", values=[1, 2, 3])
     dense_units = hp.Int("dense_units", min_value=32, max_value=512, step=32)
     n_conv_layers = hp.Int("n_conv_layers", min_value=1, max_value=6, step=1)
     n_dense_layers = hp.Int("n_dense_layers", min_value=1, max_value=6, step=1)
     learning_rate = hp.Choice("learning_rate", values=[1e-1, 1e-2, 1e-3, 1e-4])
 
     # Add convolutional layers
-    for _ in range(n_conv_layers):
+
+    model.add(
+        Conv1D(
+            filters=filter_units,
+            kernel_size=kernel_size,
+            activation="relu",
+            input_shape=[7, 1],
+        )
+    )
+    for _ in range(n_conv_layers-1):
         model.add(
             Conv1D(
                 filters=filter_units,
                 kernel_size=kernel_size,
                 activation="relu",
-                input_shape=[7, 1],
             )
         )
-
     # Add flatten layer
     model.add(Flatten())
 

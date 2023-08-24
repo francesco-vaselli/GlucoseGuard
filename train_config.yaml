@@ -28,7 +28,7 @@ model_config:
     input_shape: [7, 1]
   ar_rnn_config:
     units: 2
-    units_size: 64
+    unit_size: 64
     out_steps: 6
     num_features: 1
     dense_size: 64

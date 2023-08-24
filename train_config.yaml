@@ -6,7 +6,7 @@ batch_size: 256
 buffer_size: 1000 # not used
 epochs: 200
 optimizer: "adam"
-loss: "mse"
+loss: "mae"
 learning_rate: 0.01
 model_config:
   model_type: "rnn"

@@ -33,6 +33,7 @@ def build_model(hp):
             kernel_size=kernel_size,
             activation="relu",
             input_shape=[7, 1],
+            padding="same",
         )
     )
     for _ in range(n_conv_layers-1):
@@ -41,6 +42,7 @@ def build_model(hp):
                 filters=filter_units,
                 kernel_size=kernel_size,
                 activation="relu",
+                padding="same",
             )
         )
     # Add flatten layer

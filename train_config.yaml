@@ -25,3 +25,4 @@ model_config:
     n_dense_layers: 3
     dense_size: 64
     output_shape: 6
+    input_shape: [7, 1]

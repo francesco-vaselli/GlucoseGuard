@@ -67,6 +67,7 @@ def build_model(model_config):
 
         # Add output layer
         model.add(Dense(rnn_config["output_shape"]))
+        model.build(rnn_config["input_shape"])
         print("RNN model built:", "\n", model.summary())
     else:
         raise NotImplementedError(f"{model_config['model_type']} not implemented")

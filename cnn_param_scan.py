@@ -1,5 +1,6 @@
 import numpy as np
 import yaml
+import argparse
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
@@ -15,7 +16,7 @@ from utils import (
 )
 
 
-def build_model(hp):
+def build_cnn_model(hp):
     model = Sequential()
 
     filter_units = hp.Int("filter_units", min_value=32, max_value=512, step=32)
@@ -36,7 +37,7 @@ def build_model(hp):
             padding="same",
         )
     )
-    for _ in range(n_conv_layers-1):
+    for _ in range(n_conv_layers - 1):
         model.add(
             Conv1D(
                 filters=filter_units,
@@ -65,6 +66,42 @@ def build_model(hp):
     return model
 
 
+def build_rnn_model(hp):
+    model = Sequential()
+
+    rnn_units = hp.Int("rnn_units", min_value=32, max_value=512, step=32)
+    dense_units = hp.Int("dense_units", min_value=32, max_value=512, step=32)
+    n_rnn_layers = hp.Int("n_rnn_layers", min_value=1, max_value=6, step=1)
+    n_dense_layers = hp.Int("n_dense_layers", min_value=1, max_value=6, step=1)
+    learning_rate = hp.Choice("learning_rate", values=[1e-1, 1e-2, 1e-3, 1e-4])
+
+    # Add RNN layers
+    for i in range(n_rnn_layers):
+        return_sequences = i < (
+            n_rnn_layers - 1
+        )  # Return sequences for all but the last layer
+        model.add(
+            tf.keras.layers.LSTM(
+                units=rnn_units,
+                return_sequences=return_sequences,
+                input_shape=[7, 1] if i == 0 else None,
+            )
+        )
+
+    # Add dense layers
+    for _ in range(n_dense_layers):
+        model.add(Dense(dense_units, activation="relu"))
+
+    # Add output layer
+    model.add(Dense(6))
+
+    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+    loss = tf.keras.losses.MeanAbsoluteError()
+    model.compile(optimizer=optimizer, loss=loss)
+
+    return model
+
+
 def train(
     data_path,
     n_train,
@@ -77,6 +114,7 @@ def train(
     loss,
     learning_rate,
     model_config,
+    model_type,
 ):
     # 1. Load the data
     ds = np.load(data_path)
@@ -117,37 +155,59 @@ def train(
     test_dataset = test_dataset.batch(BATCH_SIZE)
     EPOCHS = epochs
 
+    if model_type == "cnn":
+        tuner = kt.Hyperband(
+            build_cnn_model,
+            objective="val_loss",
+            max_epochs=EPOCHS,
+            factor=3,
+            directory="logs",
+            project_name="cnn_optim",
+        )
+    elif model_type == "rnn":
+        tuner = kt.Hyperband(
+            build_rnn_model,
+            objective="val_loss",
+            max_epochs=EPOCHS,
+            factor=3,
+            directory="logs",
+            project_name="rnn_optim",
+        )
     # Using Mean Squared Error for regression tasks
-    tuner = kt.Hyperband(
-        build_model,
-        objective="val_loss",
-        max_epochs=EPOCHS,
-        factor=3,
-        directory="logs",
-        project_name="cnn_optim",
-    )
+
     stop_early = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=5)
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
         monitor="val_loss", factor=0.2, patience=5, min_lr=0.0001
     )
-    tuner.search(train_dataset,
+    tuner.search(
+        train_dataset,
         epochs=EPOCHS,
         validation_data=val_dataset,
-        callbacks=[stop_early, reduce_lr])
+        callbacks=[stop_early, reduce_lr],
+    )
 
     # Get the optimal hyperparameters
-    best_hps=tuner.get_best_hyperparameters(num_trials=1)[0]
+    best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
 
-    print(f"""
+    print(
+        f"""
     The hyperparameter search is complete. The best params are:
           {best_hps}
-    """)
+    """
+    )
 
 
 def main():
     # load cnn config from yaml
     with open("train_config.yaml", "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--model_type", type=str, default="cnn", help="Type of model to train."
+    )
+    args = parser.parse_args()
+    model_type = args.model_type
 
     data_path = config["data_path"]
     n_train = config["n_train"]
@@ -173,6 +233,7 @@ def main():
         loss,
         learning_rate,
         model_config,
+        model_type,
     )
 
 

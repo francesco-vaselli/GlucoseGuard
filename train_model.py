@@ -39,9 +39,12 @@ class FeedBack(tf.keras.Model):
 
     def call(self, inputs, training=None):
         predictions = []
-        x, state = self.warmup(inputs)
+        prediction, state = self.warmup(inputs)
+
+        predictions.append(prediction)
 
         for n in range(1, self.out_steps):
+            x = prediction
             x, state = self.lstm_rnn(
                 x, states=state, training=training
             )  # Note: using lstm_rnn here

@@ -42,7 +42,8 @@ def build_model(model_config):
 
         # Add output layer
         model.add(Dense(cnn_config["output_shape"]))
-        print("CNN model built:", "\n", model.summary())
+        print("CNN model built:", "\n")
+        model.summary()
 
     elif model_config["model_type"] == "rnn":
         rnn_config = model_config["rnn_config"]
@@ -54,7 +55,7 @@ def build_model(model_config):
                 LSTM(
                     rnn_config["rnn_units"],
                     return_sequences=return_sequences,
-                    # input_shape=rnn_config["input_shape"],
+                    input_shape=rnn_config["input_shape"],
                 )
                 # Or you can use GRU: GRU(rnn_config["units"], return_sequences=return_sequences)
             )
@@ -68,6 +69,7 @@ def build_model(model_config):
         # Add output layer
         model.add(Dense(rnn_config["output_shape"]))
         print("RNN model done")
+        model.summary()
     else:
         raise NotImplementedError(f"{model_config['model_type']} not implemented")
 

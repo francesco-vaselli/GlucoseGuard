@@ -9,7 +9,7 @@ optimizer: "adam"
 loss: "mse"
 learning_rate: 0.01
 model_config:
-  model_type: "cnn"
+  model_type: "rnn"
   cnn_config:
     n_conv_layers: 2
     filters: 64

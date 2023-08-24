@@ -15,6 +15,47 @@ from utils import (
 )
 
 
+class FeedBack(tf.keras.Model):
+    def __init__(
+        self, units, unit_size, out_steps, num_features, dense_units, dense_size
+    ):
+        super().__init__()
+        self.out_steps = out_steps
+        self.units = units
+        self.lstm_cells = [tf.keras.layers.LSTMCell(unit_size) for _ in range(units)]
+        self.lstm_rnn = tf.keras.layers.RNN(self.lstm_cells, return_state=True)
+        self.dense_layers = [
+            tf.keras.layers.Dense(dense_size, activation="relu")
+            for _ in range(dense_units)
+        ]
+        self.output_layer = tf.keras.layers.Dense(num_features)
+
+    def warmup(self, inputs):
+        x, *state = self.lstm_rnn(inputs)
+        return x, state
+
+    def call(self, inputs, training=None):
+        predictions = []
+        x, state = self.warmup(inputs)
+
+        for n in range(1, self.out_steps):
+            x, state = self.lstm_rnn(
+                x, states=state, training=training
+            )  # Note: using lstm_rnn here
+
+            for dense_layer in self.dense_layers:
+                x = dense_layer(x)
+
+            prediction = self.output_layer(x)
+            predictions.append(prediction)
+
+        predictions = tf.stack(predictions)
+        predictions = tf.transpose(predictions, [1, 0, 2])
+        predictions = tf.reshape(predictions, [-1, self.out_steps])
+
+        return predictions
+
+
 def build_model(model_config):
     if model_config["model_type"] == "cnn":
         cnn_config = model_config["cnn_config"]
@@ -62,14 +103,25 @@ def build_model(model_config):
 
         # Add dense layers
         for _ in range(rnn_config["n_dense_layers"]):
-            model.add(
-                Dense(rnn_config["dense_size"], activation="relu")
-            )
+            model.add(Dense(rnn_config["dense_size"], activation="relu"))
 
         # Add output layer
         model.add(Dense(rnn_config["output_shape"]))
         print("RNN model done")
         model.summary()
+    elif model_config["model_type"] == "ar_rnn":
+        ar_rnn_config = model_config["ar_rnn_config"]
+        feedback_model = FeedBack(
+            units=ar_rnn_config["units"],
+            unit_size=ar_rnn_config["unit_size"],
+            out_steps=ar_rnn_config["out_steps"],
+            num_features=ar_rnn_config["num_features"],
+            dense_units=ar_rnn_config["dense_units"],
+            dense_size=ar_rnn_config["dense_size"],
+        )
+        print("AR-RNN model built:", "\n")
+        feedback_model.summary()
+        return feedback_model
     else:
         raise NotImplementedError(f"{model_config['model_type']} not implemented")
 

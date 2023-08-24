@@ -9,7 +9,7 @@ optimizer: "adam"
 loss: "mae"
 learning_rate: 0.01
 model_config:
-  model_type: "rnn"
+  model_type: "ar_rnn"
   cnn_config:
     n_conv_layers: 2
     filters: 64
@@ -26,3 +26,10 @@ model_config:
     dense_size: 64
     output_shape: 6
     input_shape: [7, 1]
+  ar_rnn_config:
+    units: 2
+    units_size: 64
+    out_steps: 6
+    num_features: 1
+    dense_size: 64
+    dense_units: 3

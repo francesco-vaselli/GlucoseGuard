@@ -46,7 +46,7 @@ def build_model(model_config):
 
     elif model_config["model_type"] == "rnn":
         rnn_config = model_config["rnn_config"]
-
+        model = Sequential()
         # Add RNN layers
         for i in range(rnn_config["n_rnn_layers"]):
             return_sequences = i < (rnn_config["n_rnn_layers"] - 1)

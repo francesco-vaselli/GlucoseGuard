@@ -34,12 +34,12 @@ model_config:
     dense_size: 64
     dense_units: 3
   attn_config:
-    input_shape: [7, 1],
-    output_shape: 6,
-    head_size: 256,
-    num_heads: 4,
-    ff_dim: 4,
-    num_transformer_blocks: 4,
+    input_shape: [7, 1]
+    output_shape: 6
+    head_size: 256
+    num_heads: 4
+    ff_dim: 4
+    num_transformer_blocks: 4
     mlp_units: [128],
-    mlp_dropout: 0.4,
-    dropout: 0.25,
+    mlp_dropout: 0.4
+    dropout: 0.25

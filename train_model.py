@@ -160,7 +160,7 @@ def build_model(model_config):
         model.summary()
     elif model_config["model_type"] == "ar_rnn":
         ar_rnn_config = model_config["ar_rnn_config"]
-        feedback_model = FeedBack(
+        model = FeedBack(
             units=ar_rnn_config["units"],
             unit_size=ar_rnn_config["unit_size"],
             out_steps=ar_rnn_config["out_steps"],
@@ -170,7 +170,6 @@ def build_model(model_config):
         )
         print("AR-RNN model built:", "\n")
         # feedback_model.summary()
-        return feedback_model
     elif model_config["model_type"] == "attn":
         attn_config = model_config["attn_config"]
         model = build_attn_model(
@@ -184,6 +183,9 @@ def build_model(model_config):
             dropout=attn_config["dropout"],
             mlp_dropout=attn_config["mlp_dropout"],
         )
+        print("Transformer model built:", "\n")
+        model.summary()
+
     else:
         raise NotImplementedError(f"{model_config['model_type']} not implemented")
 

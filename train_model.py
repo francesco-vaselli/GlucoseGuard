@@ -22,7 +22,7 @@ class FeedBack(tf.keras.Model):
         super().__init__()
         self.out_steps = out_steps
         self.units = units
-        self.lstm_cells = [tf.keras.layers.LSTMCell(unit_size) for _ in range(units)]
+        self.lstm_cells = tf.keras.layers.LSTMCell(unit_size)
         self.lstm_rnn = tf.keras.layers.RNN(self.lstm_cells, return_state=True)
         self.dense_layers = [
             tf.keras.layers.Dense(dense_size, activation="relu")
@@ -44,7 +44,7 @@ class FeedBack(tf.keras.Model):
         predictions.append(prediction)
 
         for n in range(1, self.out_steps):
-            x = tf.expand_dims(prediction, 1)            
+            # x = tf.expand_dims(prediction, 1)            
             x, state = self.lstm_rnn(
                 x, states=state, training=training
             )  # Note: using lstm_rnn here

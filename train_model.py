@@ -47,7 +47,7 @@ class FeedBack(tf.keras.Model):
             # x = prediction
             x = tf.expand_dims(prediction, 1)            
             x, state = self.lstm_rnn(
-                x, states=state, training=training
+                x, initial_state=state, training=training
             )  # Note: using lstm_rnn here
 
             for dense_layer in self.dense_layers:

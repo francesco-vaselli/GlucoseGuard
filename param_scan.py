@@ -153,23 +153,27 @@ def train(
     # get one element from the val dataset and print its shape
     print("val_dataset shape:", next(iter(val_dataset.batch(1)))[0].shape)
     test_dataset = test_dataset.batch(BATCH_SIZE)
-    EPOCHS = epochs
+    EPOCHS = 50
 
     if model_type == "cnn":
-        tuner = kt.Hyperband(
+        tuner = kt.BayesianOptimization(
             build_cnn_model,
             objective="val_loss",
-            max_epochs=EPOCHS,
-            factor=3,
+            max_trials=100,
+            num_initial_points=None,
+            alpha=0.0001,
+            beta=2.6,
             directory="logs",
             project_name="cnn_optim",
         )
     elif model_type == "rnn":
-        tuner = kt.Hyperband(
+        tuner = kt.BayesianOptimization(
             build_rnn_model,
             objective="val_loss",
-            max_epochs=EPOCHS,
-            factor=3,
+            max_trials=100,
+            num_initial_points=None,
+            alpha=0.0001,
+            beta=2.6,
             directory="logs",
             project_name="rnn_optim",
         )

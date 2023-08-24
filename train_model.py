@@ -52,7 +52,7 @@ def build_attn_model(
     for dim in mlp_units:
         x = layers.Dense(dim, activation="relu")(x)
         x = layers.Dropout(mlp_dropout)(x)
-    outputs = layers.Dense(output_shape)
+    outputs = layers.Dense(output_shape)(x)
     return keras.Model(inputs, outputs)
 
 

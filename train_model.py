@@ -1,9 +1,10 @@
 import numpy as np
+import argparse
 import yaml
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, Flatten, Dense
+from tensorflow.keras.layers import Conv1D, Flatten, Dense, LSTM
 from tensorflow.keras.callbacks import TensorBoard
 import datetime
 
@@ -42,6 +43,31 @@ def build_model(model_config):
         # Add output layer
         model.add(Dense(cnn_config["output_shape"]))
         print("CNN model built:", "\n", model.summary())
+
+    elif model_config["model_type"] == "rnn":
+        rnn_config = model_config["rnn_config"]
+
+        # Add RNN layers
+        for i in range(rnn_config["n_rnn_layers"]):
+            return_sequences = i < (rnn_config["n_rnn_layers"] - 1)
+            model.add(
+                LSTM(
+                    rnn_config["rnn_units"],
+                    return_sequences=return_sequences,
+                    # input_shape=rnn_config["input_shape"],
+                )
+                # Or you can use GRU: GRU(rnn_config["units"], return_sequences=return_sequences)
+            )
+
+        # Add dense layers
+        for _ in range(rnn_config["n_dense_layers"]):
+            model.add(
+                Dense(rnn_config["dense_size"], activation="relu")
+            )
+
+        # Add output layer
+        model.add(Dense(rnn_config["output_shape"]))
+        print("RNN model built:", "\n", model.summary())
     else:
         raise NotImplementedError(f"{model_config['model_type']} not implemented")
 
@@ -60,6 +86,7 @@ def train(
     loss,
     learning_rate,
     model_config,
+    log_name,
 ):
     # 1. Load the data
     ds = np.load(data_path)
@@ -118,7 +145,8 @@ def train(
     model.compile(
         optimizer=optimizer, loss=loss
     )  # Using Mean Squared Error for regression tasks
-    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    log_dir = "logs/fit/" + log_name
+    # datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
     # After setting up your train_dataset and val_dataset
     image_logging_callback = CustomImageLogging(log_dir, val_dataset)
@@ -150,6 +178,12 @@ def train(
 
 
 def main():
+    # parse command line arguments to get log name
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--log_name", type=str, required=True)
+    args = parser.parse_args()
+    log_name = args.log_name
     # load cnn config from yaml
     with open("train_config.yaml", "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
@@ -178,6 +212,7 @@ def main():
         loss,
         learning_rate,
         model_config,
+        log_name,
     )
 
 

@@ -19,3 +19,9 @@ model_config:
     n_dense_layers: 3
     dense_size: 64
     output_shape: 6
+  rnn_config:
+    n_rnn_layers: 2
+    rnn_units: 64
+    n_dense_layers: 3
+    dense_size: 64
+    output_shape: 6

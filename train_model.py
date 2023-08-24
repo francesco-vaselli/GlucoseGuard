@@ -32,7 +32,10 @@ class FeedBack(tf.keras.Model):
 
     def warmup(self, inputs):
         x, *state = self.lstm_rnn(inputs)
-        return x, state
+        for dense_layer in self.dense_layers:
+            x = dense_layer(x) 
+        prediction = self.output_layer(x)
+        return prediction, state
 
     def call(self, inputs, training=None):
         predictions = []

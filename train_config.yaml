@@ -9,7 +9,7 @@ optimizer: "adam"
 loss: "mae"
 learning_rate: 0.01
 model_config:
-  model_type: "ar_rnn"
+  model_type: "attn"
   cnn_config:
     n_conv_layers: 2
     filters: 64
@@ -33,3 +33,13 @@ model_config:
     num_features: 1
     dense_size: 64
     dense_units: 3
+  attn_config:
+    input_shape: [7, 1],
+    output_shape: 6,
+    head_size: 256,
+    num_heads: 4,
+    ff_dim: 4,
+    num_transformer_blocks: 4,
+    mlp_units: [128],
+    mlp_dropout: 0.4,
+    dropout: 0.25,

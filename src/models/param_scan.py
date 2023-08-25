@@ -49,7 +49,7 @@ def build_transformer_model(hp):
         x = transformer_encoder(x, head_size, num_heads, ff_dim, dropout)
 
     x = layers.GlobalAveragePooling1D(data_format="channels_first")(x)
-    for _ in mlp_layers:
+    for _ in range(mlp_layers):
         x = layers.Dense(mlp_dim, activation="relu")(x)
         x = layers.Dropout(dropout)(x)
     outputs = layers.Dense(6)(x)

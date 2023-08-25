@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from CGMSdata import CGMSData
-from MixUp import MixUp as mixup
+from src.data_processing.CGMSdata import CGMSData
+from src.data_processing.MixUp import MixUp as mixup
 
 
 class CGMSDataSeg(CGMSData):

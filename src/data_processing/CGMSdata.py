@@ -2,7 +2,7 @@ import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
-from data_reader import DataReader
+from src.data_processing.data_reader import DataReader
 from scipy import signal
 from sklearn.metrics import mean_squared_error
 

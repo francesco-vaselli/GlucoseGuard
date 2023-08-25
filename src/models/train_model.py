@@ -10,7 +10,7 @@ from tensorflow.keras import layers
 from tensorflow import keras
 import datetime
 
-from utils import (
+from src.utils import (
     CustomImageLogging,
     ClassificationMetrics,
     filter_stationary_sequences_dataset,

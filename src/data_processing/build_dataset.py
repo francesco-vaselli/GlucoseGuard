@@ -4,8 +4,8 @@ import yaml
 import os
 
 import numpy as np
-from CGMSDataSeg import CGMSDataSeg
-from data_reader import DataReader
+from src.data_processing.CGMSDataSeg import CGMSDataSeg
+from src.data_processing.data_reader import DataReader
 
 
 def build_dataset(

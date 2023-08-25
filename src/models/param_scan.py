@@ -9,7 +9,7 @@ from tensorflow.keras.callbacks import TensorBoard
 import datetime
 import keras_tuner as kt
 
-from utils import (
+from src.utils import (
     CustomImageLogging,
     ClassificationMetrics,
     filter_stationary_sequences_dataset,

@@ -6,6 +6,8 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, Flatten, Dense
 from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.keras import layers
+from tensorflow import keras
 import datetime
 import keras_tuner as kt
 
@@ -15,6 +17,52 @@ from src.utils import (
     filter_stationary_sequences_dataset,
 )
 
+def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
+    # Normalization and Attention
+    x = layers.LayerNormalization(epsilon=1e-6)(inputs)
+    x = layers.MultiHeadAttention(
+        key_dim=head_size, num_heads=num_heads, dropout=dropout
+    )(x, x)
+    x = layers.Dropout(dropout)(x)
+    res = x + inputs
+
+    # Feed Forward Part
+    x = layers.LayerNormalization(epsilon=1e-6)(res)
+    x = layers.Conv1D(filters=ff_dim, kernel_size=1, activation="relu")(x)
+    x = layers.Dropout(dropout)(x)
+    x = layers.Conv1D(filters=inputs.shape[-1], kernel_size=1)(x)
+    return x + res
+
+def build_transformer_model(hp):
+    head_size = hp.Int("head_size", min_value=32, max_value=512, step=32)
+    num_heads = hp.Int("num_heads", min_value=1, max_value=8, step=1)
+    ff_dim = hp.Int("ff_dim", min_value=32, max_value=512, step=32)
+    num_transformer_blocks = hp.Int("num_transformer_blocks", min_value=1, max_value=6, step=1)
+    mlp_dim = hp.Int("mlp_dim", min_value=32, max_value=512, step=32)
+    mlp_layers = hp.Int("mlp_layers", min_value=1, max_value=4, step=1)
+    dropout = hp.Float("mlp_dropout", min_value=0.0, max_value=0.5, step=0.1)
+    learning_rate = hp.Choice("learning_rate", values=[1e-1, 1e-2, 1e-3, 1e-4])
+
+
+    inputs = keras.Input(shape=[7, 1])
+    x = inputs
+    for _ in range(num_transformer_blocks):
+        x = transformer_encoder(x, head_size, num_heads, ff_dim, dropout)
+
+    x = layers.GlobalAveragePooling1D(data_format="channels_first")(x)
+    for _ in mlp_layers:
+        x = layers.Dense(mlp_dim, activation="relu")(x)
+        x = layers.Dropout(dropout)(x)
+    outputs = layers.Dense(6)(x)
+    model = keras.Model(inputs, outputs)
+
+    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+
+    loss = tf.keras.losses.MeanAbsoluteError()
+
+    model.compile(optimizer=optimizer, loss=loss)
+
+    return model
 
 def build_cnn_model(hp):
     model = Sequential()
@@ -176,6 +224,17 @@ def train(
             directory="logs",
             project_name="rnn_optim",
         )
+    elif model_type == "transformer":
+        tuner = kt.BayesianOptimization(
+            build_transformer_model,
+            objective="val_loss",
+            max_trials=100,
+            num_initial_points=None,
+            alpha=0.0001,
+            beta=2.6,
+            directory="logs",
+            project_name="transformer_optim",
+        )
     # Using Mean Squared Error for regression tasks
 
     stop_early = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=5)
@@ -191,6 +250,8 @@ def train(
 
     # Get the optimal hyperparameters
     best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
+    best_hps1 = tuner.results_summary(num_trials=1)
+
 
     print(
         f"""
@@ -202,7 +263,7 @@ def train(
 
 def main():
     # load cnn config from yaml
-    with open("train_config.yaml", "r") as f:
+    with open("configs/train_config.yaml", "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     parser = argparse.ArgumentParser()

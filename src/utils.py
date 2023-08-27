@@ -156,15 +156,20 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
         # Get predictions
         x = []
         y_true = []
+        y_pred = []
         BUF = 100
         for n in range(self.num_samples):
             x_i, y_true_i = next(iter(self.val_data.skip(BUF*n).take(1)))
+            y_pred_i = self.model.predict(x_i)
+
             x.append(x_i)
             y_true.append(y_true_i)
+            y_pred.append(y_pred_i)
         
         x = np.array(x)
         y_true = np.array(y_true)
-        y_pred = self.model.predict(x)
+        y_pred = np.array(y_pred)
+        # y_pred = self.model.predict(x)
         time_intervals_x = np.arange(0, 5 * x[0].shape[0], 5)
         time_intervals_y = np.arange(
             5 * x[0].shape[0], 5 * x[0].shape[0] + 5 * y_true[0].shape[0], 5

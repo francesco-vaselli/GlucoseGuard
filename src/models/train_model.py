@@ -303,7 +303,7 @@ def main():
     args = parser.parse_args()
     log_name = args.log_name
     # load cnn config from yaml
-    with open("train_config.yaml", "r") as f:
+    with open("configs/train_config.yaml", "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     data_path = config["data_path"]

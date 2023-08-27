@@ -60,7 +60,7 @@ def check_classification(true, pred, threshold=80, standard=True, ind=5):
     # Assuming true and pred have shape [batch_size, seq_length, feature_dim]
     # and that the value of interest is the last in the sequence
 
-    std, mean = 58.119, 144.982
+    std, mean = 57.94, 144.982
     if standard:
         pred = pred * std + mean
         true = true * std + mean

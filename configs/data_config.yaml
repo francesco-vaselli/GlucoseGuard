@@ -156,6 +156,7 @@ target_weight: 1
 # standardize
 standardize: True
 # Computed Mean: 144.98199462890625, Computed Std: 58.11943817138672
+# dataset smooth Computed Mean: 144.98204040527344, Computed Std: 57.940860748291016
 # cutpoint (negative= take all the data)
 cutpoint: -1
 # augment type

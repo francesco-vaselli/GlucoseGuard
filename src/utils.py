@@ -154,7 +154,16 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
         # ):  # Here we check if the epoch is a multiple of 5 (adjust if 0-indexing is confusing)
         #    return
         # Get predictions
-        x, y_true = next(iter(self.val_data.take(self.num_samples)))
+        x = []
+        y_true = []
+        BUF = 100
+        for n in range(self.num_samples):
+            x_i, y_true_i = next(iter(self.val_data.skip(BUF*n).take(1)))
+            x.append(x_i)
+            y_true.append(y_true_i)
+        
+        x = np.array(x)
+        y_true = np.array(y_true)
         y_pred = self.model.predict(x)
         time_intervals_x = np.arange(0, 5 * x[0].shape[0], 5)
         time_intervals_y = np.arange(

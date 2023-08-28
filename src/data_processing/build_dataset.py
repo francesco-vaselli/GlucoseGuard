@@ -4,8 +4,8 @@ import yaml
 import os
 
 import numpy as np
-from src.data_processing.CGMSDataSeg import CGMSDataSeg
-from src.data_processing.data_reader import DataReader
+from CGMSDataSeg import CGMSDataSeg
+from data_reader import DataReader
 
 
 def build_dataset(
@@ -102,8 +102,8 @@ def main(data_config):
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     data_dir = config["data_dir"]
-    ids = config["ids"]
-    test_ids = config["test_ids"]
+    ids = config["test_ids"]
+    test_ids = config["ids"]
     sampling_horizon = config["sampling_horizon"]
     prediction_horizon = config["prediction_horizon"]
     scale = config["scale"]
@@ -133,10 +133,10 @@ def main(data_config):
 
     # save data and targets as numpy arrays, in same file
     dataset = np.concatenate((data, targets), axis=1)
-    np.save("data/dataset.npy", dataset)
+    np.save("dataset_64406000.npy", dataset)
     # dataset = tf.data.Dataset.from_tensor_slices((data, targets))
     # save
     # dataset.save("data/dataset")
 
 if __name__ == "__main__":
-    main('data_config.yaml')
+    main('/home/fvaselli/Documents/PHD/TSA/TSA/configs/data_config.yaml')

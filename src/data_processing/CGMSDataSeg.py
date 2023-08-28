@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from src.data_processing.CGMSdata import CGMSData
-from src.data_processing.MixUp import MixUp as mixup
+from CGMSdata import CGMSData
+from MixUp import MixUp as mixup
 
 
 class CGMSDataSeg(CGMSData):
@@ -170,20 +170,25 @@ class CGMSDataSeg(CGMSData):
     def undersampling(self, ratio, padding):
         if padding == "Same":
             nonhypo_loc = np.where(self._original_train_y[:, 0] >= self._hypo_th)
+        elif padding == "History":
+            nonhypo_loc = np.where(self._original_train_y[:, -1] >= self._hypo_th)
         elif padding == "None":
             nonhypo_loc = np.where(self._original_train_y >= self._hypo_th)
         nonhypo_loc = nonhypo_loc[0]
         nonhypo_train_x = self._original_train_x[nonhypo_loc]
         nonhypo_train_y = self._original_train_y[nonhypo_loc]
         num = int(ratio * nonhypo_loc.size)
+        print("Non hypo data size: ", nonhypo_loc.size)
         indx = np.random.choice(nonhypo_loc.size, num)
         self.train_x = np.vstack((nonhypo_train_x[indx], self._hypo_train_x))
-        if padding == "Same":
+        if padding == "Same" or padding == "History":
             self.train_y = np.vstack((nonhypo_train_y[indx], self._hypo_train_y))
         elif padding == "None":
             self.train_y = np.hstack((nonhypo_train_y[indx], self._hypo_train_y))
         self.train_x *= self.scale
         self.train_y *= self.scale
+        self._original_train_x = self.train_x
+        self._original_train_y = self.train_y
         self.train_n = self.train_x.shape[0]
         print("After {} undersampling, {} train data".format(ratio, self.train_n))
         self.train_idx = np.arange(self.train_n)
@@ -219,16 +224,13 @@ class CGMSDataSeg(CGMSData):
         print("After {} fold mixing up, {} train data".format(m, self.train_n))
         self.train_idx = np.arange(self.train_n)
 
-    def gaussian_noise(self, num_augmentations=1, padding="Same"):
+    def gaussian_noise(self, num_augmentations=1, padding="Same", var=0.1):
         """
         Apply Gaussian noise to the input data to augment it.
 
         :param num_augmentations: How many times to apply different Gaussian noise to the same input sequences.
         :param padding: Padding method for the output sequences.
         """
-
-        # Define variance for Gaussian noise
-        var = 0.1
 
         augmented_train_x = [self._original_train_x]
         augmented_train_y = [self._original_train_y]

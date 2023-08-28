@@ -14,6 +14,7 @@ from src.utils import (
     CustomImageLogging,
     ClassificationMetrics,
     filter_stationary_sequences_dataset,
+    train_transfer
 )
 
 def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
@@ -194,6 +195,7 @@ def build_model(model_config):
 
 def train(
     data_path,
+    transfer_data_path,
     n_train,
     n_val,
     n_test,
@@ -205,6 +207,8 @@ def train(
     learning_rate,
     model_config,
     log_name,
+    save_model=True,
+    transfer_learning=False,
 ):
     # 1. Load the data
     ds = np.load(data_path)
@@ -287,13 +291,14 @@ def train(
             classification_metrics_callback,
         ],
     )
-    # plot the loss
 
-    plt.plot(history.history["loss"], label="train")
-    plt.plot(history.history["val_loss"], label="val")
-    plt.legend()
-    plt.savefig("loss.png")
-
+    if save_model:
+        model.save(f"models/{log_name}.h5")
+    
+    if transfer_learning:
+        model, history = train_transfer(transfer_data_path, log_name, batch_size, epochs, model)
+        
+    
 
 def main():
     # parse command line arguments to get log name
@@ -307,6 +312,7 @@ def main():
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     data_path = config["data_path"]
+    transfer_data_path = config["transfer_data_path"]
     n_train = config["n_train"]
     n_val = config["n_val"]
     n_test = config["n_test"]
@@ -317,9 +323,12 @@ def main():
     loss = config["loss"]
     learning_rate = config["learning_rate"]
     model_config = config["model_config"]
+    save_model = config["save_model"]
+    transfer_learning = config["transfer_learning"]
 
     train(
         data_path,
+        transfer_data_path,
         n_train,
         n_val,
         n_test,
@@ -331,6 +340,8 @@ def main():
         learning_rate,
         model_config,
         log_name,
+        save_model=True,
+        transfer_learning=False,
     )
 
 

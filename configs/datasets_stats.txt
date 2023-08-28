@@ -1,0 +1,68 @@
+Patient 63047517 has 29 entries.
+Patient 63047517 has 5444 entries.
+Reading 29 segments
+29
+5444
+Resetting data...
+Building dataset, requesting data from 0 to 5444
+Train data requested beyond limit, using all as train data
+Shape of original train data:  (22081, 6)
+<class 'numpy.ndarray'> <class 'int'>
+(22081,)
+[164. 164. 171. ... 157. 150. 150.]
+80
+False
+False
+############################ Data structure summary ############################
+Hypo/no_hypo: 854/21227
+Found 5444 continuous time series, however not all will pass the window requirements
+Data shape: (22081, 7), Train/test: 22081/0
+Test data is empty...
+################################################################################
+Computed Mean: 143.63031005859375, Computed Std: 44.54182052612305
+
+Patient 99908129 has 9894 entries.
+Patient 99908129 has 27982 entries.
+Reading 9894 segments
+9894
+27982
+Resetting data...
+Building dataset, requesting data from 0 to 27982
+Train data requested beyond limit, using all as train data
+Shape of original train data:  (19974, 6)
+<class 'numpy.ndarray'> <class 'int'>
+(19974,)
+[211. 204. 172. ... 275. 269.  73.]
+80
+False
+False
+############################ Data structure summary ############################
+Hypo/no_hypo: 1379/18595
+Found 27982 continuous time series, however not all will pass the window requirements
+Data shape: (19974, 7), Train/test: 19974/0
+Test data is empty...
+################################################################################
+Computed Mean: 141.87020874023438, Computed Std: 53.19660568237305
+
+➜ python upsample_dataset.py
+Reading 9615 segments
+Resetting data...
+Building dataset, requesting data from 0 to 5274394
+Train data requested beyond limit, using all as train data
+Shape of original train data:  (5274394, 6)
+<class 'numpy.ndarray'> <class 'int'>
+(5274394,)
+[127.80974 129.80971 122.85742 ... 160.57115 161.28543 162.2378 ]
+80
+False
+False
+############################ Data structure summary ############################
+Hypo/no_hypo: 400715/4873679
+Found 5274394 continuous time series, however not all will pass the window requirements
+Data shape: (5274394, 7), Train/test: 5274394/0
+Test data is empty...
+################################################################################
+Non hypo data size:  4873679
+After 0.5 undersampling, 2837554 train data
+After adding gaussian noise, 3638984 train data
+Computed Mean: 124.70203247673234, Computed Std: 60.27990111508175

@@ -5,13 +5,81 @@ import numpy as np
 from sklearn.metrics import confusion_matrix, roc_curve, auc
 import itertools
 
-def filter_stationary_sequences_dataset(ds):
 
+def filter_stationary_sequences_dataset(ds):
     mask = np.ones(len(ds), dtype=bool)
     std = np.std(ds, axis=1)
     mask[std == 0] = False
 
     return ds[mask]
+
+
+def train_transfer(data_path, log_name, batch_size, epochs, model):
+    # 1. Load the data
+    ds = np.load(data_path)
+    ds = filter_stationary_sequences_dataset(ds)
+    n_train = 10000
+    n_val = 2000
+    n_test = 6000
+    train_x = ds[:, :7]
+    train_y = ds[:n_train, 7:]
+    val_x = ds[n_train : n_train + n_val, :7]
+    val_y = ds[n_train : n_train + n_val, 7:]
+    test_x = ds[n_train + n_val : n_train + n_val + n_test, :7]
+    test_y = ds[n_train + n_val : n_train + n_val + n_test, 7:]
+    print("train_x shape:", train_x.shape)
+
+    # Ensure that train_x has the right shape [samples, timesteps, features]
+    # for the moment this stays
+    if len(train_x.shape) == 2:
+        train_x = np.expand_dims(train_x, axis=-1)
+        val_x = np.expand_dims(val_x, axis=-1)
+        test_x = np.expand_dims(test_x, axis=-1)
+
+    # 2. Build the dataset
+    BATCH_SIZE = batch_size
+
+    train_dataset = tf.data.Dataset.from_tensor_slices((train_x, train_y))
+    val_dataset = tf.data.Dataset.from_tensor_slices((val_x, val_y))
+    test_dataset = tf.data.Dataset.from_tensor_slices((test_x, test_y))
+
+    train_dataset = (
+        train_dataset.shuffle(
+            train_dataset.cardinality()
+        )  # shuffle all as it is a small dataset
+        .batch(BATCH_SIZE)
+        .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    )
+    val_dataset = val_dataset.batch(BATCH_SIZE)
+    # get one element from the val dataset and print its shape
+    print("val_dataset shape:", next(iter(val_dataset.batch(1)))[0].shape)
+    test_dataset = test_dataset.batch(BATCH_SIZE)
+    # new log dir is same as before + _transfer
+    log_dir = "logs/fit/" + log_name + "_transfer"
+    tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
+    # After setting up your train_dataset and val_dataset
+    image_logging_callback = CustomImageLogging(log_dir, val_dataset)
+    # Training the model with reducelronplateau callback and early stopping
+    classification_metrics_callback = ClassificationMetrics(
+        test_dataset, log_dir, test_y=test_y, threshold=80
+    )
+    EPOCHS = epochs
+    history = model.fit(
+        train_dataset,
+        epochs=EPOCHS,
+        validation_data=val_dataset,
+        callbacks=[
+            tf.keras.callbacks.ReduceLROnPlateau(
+                monitor="val_loss", factor=0.5, patience=5, min_lr=0.00001
+            ),
+            tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
+            tensorboard_callback,
+            image_logging_callback,
+            classification_metrics_callback,
+        ],
+    )
+    return model, history
+
 
 def plot_confusion_matrix(cm, class_names):
     figure = plt.figure(figsize=(8, 8))
@@ -60,7 +128,7 @@ def check_classification(true, pred, threshold=80, standard=True, ind=5):
     # Assuming true and pred have shape [batch_size, seq_length, feature_dim]
     # and that the value of interest is the last in the sequence
 
-    std, mean = 57.94, 144.982
+    std, mean = 60.279, 124.70
     if standard:
         pred = pred * std + mean
         true = true * std + mean

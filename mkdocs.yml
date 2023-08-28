@@ -1,0 +1,36 @@
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github 
+    admonition:
+      warning: material/alert
+
+site_name: GlucoseGuard
+# "GlucoseGuard: A Time-Series Approach to Predicting Blood Sugar Levels"
+site_url: https://francesco-vaselli.github.io/glucoseguard/
+
+nav:
+    - Home: index.md
+
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+repo_url: https://github.com/francesco-vaselli/TSA
+repo_name: francesco-vaselli/TSA
+edit_uri: ""
+
+  

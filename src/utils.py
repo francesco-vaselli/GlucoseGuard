@@ -164,7 +164,7 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
         y_true = self.test_y
 
         true_label, pred_label, fpr, tpr, roc_auc = check_classification(
-            y_true, y_pred, self.threshold, self.std, self.mean
+            y_true, y_pred, self.threshold, std=self.std, mean=self.mean
         )
 
         with self.writer.as_default():

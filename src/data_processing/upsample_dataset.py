@@ -87,7 +87,7 @@ def main():
     parser.add_argument(
         "--undersample_ratio",
         type=float,
-        default=0.5,
+        default=0.6,
     )
 
     args = parser.parse_args()

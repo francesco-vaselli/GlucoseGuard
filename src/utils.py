@@ -125,7 +125,7 @@ def plot_roc_curve(fpr, tpr, roc_auc):
     return figure
 
 
-def check_classification(true, pred, threshold=80, standard=True, ind=5, std=60.413, mean=127.834):
+def check_classification(true, pred, threshold=80, standard=True, ind=5, std=57.94, mean=144.98):
     # Assuming true and pred have shape [batch_size, seq_length, feature_dim]
     # and that the value of interest is the last in the sequence
 

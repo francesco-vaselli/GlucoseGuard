@@ -306,9 +306,9 @@ def train(
             transfer_data_mean,
             transfer_data_std,
             log_name,
-            batch_size,
-            epochs,
-            model,
+            batch_size=32,
+            epochs=epochs,
+            model=model,
         )
 
 

@@ -2,6 +2,7 @@ import io
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
+from tensorflow.keras.callbacks import TensorBoard
 from sklearn.metrics import confusion_matrix, roc_curve, auc
 import itertools
 
@@ -61,7 +62,7 @@ def train_transfer(data_path, log_name, batch_size, epochs, model):
     image_logging_callback = CustomImageLogging(log_dir, val_dataset)
     # Training the model with reducelronplateau callback and early stopping
     classification_metrics_callback = ClassificationMetrics(
-        test_dataset, log_dir, test_y=test_y, threshold=80
+        test_dataset, log_dir, test_y=test_y, threshold=80, std=53.196, mean=141.87
     )
     EPOCHS = epochs
     history = model.fit(
@@ -124,11 +125,10 @@ def plot_roc_curve(fpr, tpr, roc_auc):
     return figure
 
 
-def check_classification(true, pred, threshold=80, standard=True, ind=5):
+def check_classification(true, pred, threshold=80, standard=True, ind=5, std=60.413, mean=127.834):
     # Assuming true and pred have shape [batch_size, seq_length, feature_dim]
     # and that the value of interest is the last in the sequence
 
-    std, mean = 60.279, 124.70
     if standard:
         pred = pred * std + mean
         true = true * std + mean

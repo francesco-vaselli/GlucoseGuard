@@ -1,4 +1,4 @@
-data_path: "./data/dataset_smooth.npy"
+data_path: "./data/dataset_smooth_upsampled.npy"
 transfer_data_path: "./data/dataset_99908129.npy"
 n_train: 3000000
 n_val: 300000

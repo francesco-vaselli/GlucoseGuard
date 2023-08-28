@@ -63,6 +63,6 @@ Data shape: (5274394, 7), Train/test: 5274394/0
 Test data is empty...
 ################################################################################
 Non hypo data size:  4873679
-After 0.5 undersampling, 2837554 train data
-After adding gaussian noise, 3638984 train data
-Computed Mean: 124.70203247673234, Computed Std: 60.27990111508175
+After 0.6 undersampling, 3324922 train data
+After adding gaussian noise, 4126352 train data
+Computed Mean: 127.83423114384799, Computed Std: 60.413653553031864

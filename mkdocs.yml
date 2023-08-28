@@ -7,7 +7,7 @@ theme:
 
 site_name: GlucoseGuard
 # "GlucoseGuard: A Time-Series Approach to Predicting Blood Sugar Levels"
-site_url: https://francesco-vaselli.github.io/glucoseguard/
+site_url: https://francesco-vaselli.github.io/GlucoseGuard/
 
 nav:
     - Home: index.md
@@ -29,8 +29,8 @@ extra_javascript:
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
-repo_url: https://github.com/francesco-vaselli/TSA
-repo_name: francesco-vaselli/TSA
+repo_url: https://github.com/francesco-vaselli/GlucoseGuard
+repo_name: francesco-vaselli/GlucoseGuard
 edit_uri: ""
 
   

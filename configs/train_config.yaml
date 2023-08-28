@@ -1,5 +1,11 @@
-data_path: "./data/dataset_smooth.npy"
+data_path: "./data/dataset_smooth_upsampled.npy"
+data_mean: 127.836
+# 144.98204040527344
+data_std: 60.410
+# 57.940860748291016
 transfer_data_path: "./data/dataset_99908129.npy"
+transfer_data_mean: 141.87
+transfer_data_std: 53.19
 n_train: 3000000
 n_val: 300000
 n_test: 500000

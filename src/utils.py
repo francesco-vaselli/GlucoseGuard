@@ -15,7 +15,7 @@ def filter_stationary_sequences_dataset(ds):
     return ds[mask]
 
 
-def train_transfer(data_path, log_name, batch_size, epochs, model):
+def train_transfer(data_path, mean, std, log_name, batch_size, epochs, model):
     # 1. Load the data
     ds = np.load(data_path)
     ds = filter_stationary_sequences_dataset(ds)
@@ -62,7 +62,7 @@ def train_transfer(data_path, log_name, batch_size, epochs, model):
     image_logging_callback = CustomImageLogging(log_dir, val_dataset)
     # Training the model with reducelronplateau callback and early stopping
     classification_metrics_callback = ClassificationMetrics(
-        test_dataset, log_dir, test_y=test_y, threshold=80, std=53.196, mean=141.87
+        test_dataset, log_dir, test_y=test_y, threshold=80, std=std, mean=mean
     )
     EPOCHS = epochs
     history = model.fit(
@@ -146,12 +146,14 @@ def check_classification(true, pred, threshold=80, standard=True, ind=5, std=57.
 
 
 class ClassificationMetrics(tf.keras.callbacks.Callback):
-    def __init__(self, val_data, log_dir, test_y, threshold=80):
+    def __init__(self, val_data, log_dir, test_y, threshold=80, std=57.94, mean=144.98):
         super().__init__()
         self.val_data = val_data
         self.threshold = threshold
         self.writer = tf.summary.create_file_writer(log_dir)
         self.test_y = test_y
+        self.std = std
+        self.mean = mean
 
     def on_epoch_end(self, epoch, logs=None):
         # if (
@@ -162,7 +164,7 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
         y_true = self.test_y
 
         true_label, pred_label, fpr, tpr, roc_auc = check_classification(
-            y_true, y_pred, self.threshold
+            y_true, y_pred, self.threshold, self.std, self.mean
         )
 
         with self.writer.as_default():

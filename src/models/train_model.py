@@ -14,8 +14,9 @@ from src.utils import (
     CustomImageLogging,
     ClassificationMetrics,
     filter_stationary_sequences_dataset,
-    train_transfer
+    train_transfer,
 )
+
 
 def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
     # Normalization and Attention
@@ -32,6 +33,7 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
     x = layers.Dropout(dropout)(x)
     x = layers.Conv1D(filters=inputs.shape[-1], kernel_size=1)(x)
     return x + res
+
 
 def build_attn_model(
     input_shape,
@@ -57,7 +59,6 @@ def build_attn_model(
     return keras.Model(inputs, outputs)
 
 
-
 class FeedBack(tf.keras.Model):
     def __init__(
         self, units, unit_size, out_steps, num_features, dense_units, dense_size
@@ -76,7 +77,7 @@ class FeedBack(tf.keras.Model):
     def warmup(self, inputs):
         x, *state = self.lstm_rnn(inputs)
         for dense_layer in self.dense_layers:
-            x = dense_layer(x) 
+            x = dense_layer(x)
         prediction = self.output_layer(x)
         return prediction, state
 
@@ -88,7 +89,7 @@ class FeedBack(tf.keras.Model):
 
         for n in range(1, self.out_steps):
             # x = prediction
-            x = tf.expand_dims(prediction, 1)            
+            x = tf.expand_dims(prediction, 1)
             x, *state = self.lstm_rnn(
                 x, initial_state=state, training=training
             )  # Note: using lstm_rnn here
@@ -195,7 +196,11 @@ def build_model(model_config):
 
 def train(
     data_path,
+    data_mean,
+    data_std,
     transfer_data_path,
+    transfer_data_mean,
+    transfer_data_std,
     n_train,
     n_val,
     n_test,
@@ -274,7 +279,7 @@ def train(
     image_logging_callback = CustomImageLogging(log_dir, val_dataset)
     # Training the model with reducelronplateau callback and early stopping
     classification_metrics_callback = ClassificationMetrics(
-        test_dataset, log_dir, test_y=test_y, threshold=80
+        test_dataset, log_dir, test_y=test_y, threshold=80, std=data_std, mean=data_mean
     )
     EPOCHS = epochs
     history = model.fit(
@@ -294,11 +299,18 @@ def train(
 
     if save_model:
         model.save(f"models/{log_name}.h5")
-    
+
     if transfer_learning:
-        model, history = train_transfer(transfer_data_path, log_name, batch_size, epochs, model)
-        
-    
+        model, history = train_transfer(
+            transfer_data_path,
+            transfer_data_mean,
+            transfer_data_std,
+            log_name,
+            batch_size,
+            epochs,
+            model,
+        )
+
 
 def main():
     # parse command line arguments to get log name
@@ -312,7 +324,11 @@ def main():
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     data_path = config["data_path"]
+    data_mean = config["data_mean"]
+    data_std = config["data_std"]
     transfer_data_path = config["transfer_data_path"]
+    transfer_data_mean = config["transfer_data_mean"]
+    transfer_data_std = config["transfer_data_std"]
     n_train = config["n_train"]
     n_val = config["n_val"]
     n_test = config["n_test"]
@@ -328,7 +344,11 @@ def main():
 
     train(
         data_path,
+        data_mean,
+        data_std,
         transfer_data_path,
+        transfer_data_mean,
+        transfer_data_std,
         n_train,
         n_val,
         n_test,

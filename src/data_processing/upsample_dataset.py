@@ -72,7 +72,7 @@ def main():
     parser.add_argument(
         "--upsample_strategy",
         type=str,
-        default="GaussianNoise",
+        default="MixUp",
     )
     parser.add_argument(
         "--upsample_factor",

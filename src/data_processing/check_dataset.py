@@ -23,7 +23,7 @@ def filter_stationary_sequences_dataset(ds):
     return ds[mask]
 
 
-data_path = "/home/fvaselli/Documents/PHD/TSA/TSA/data/dataset.npy"
+data_path = "/home/fvaselli/Documents/PHD/TSA/TSA/data/dataset_smooth_upsampled.npy"
 ds = np.load(data_path)
 train_x = ds[:, :7]
 train_y = ds[:, 7:]
@@ -35,8 +35,8 @@ train_y = ds[:, 7:]
 # filter_stationary_sequences(train_x, train_y)
 print(train_x.shape, train_y.shape)
 # restore mean and std
-mean = 144.98
-std = 58.1
+mean = 127.834
+std = 60.4
 
 train_x = train_x[2000000:2000000+10, :]
 train_y = train_y[2000000:2000000+10, :]

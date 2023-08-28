@@ -58,6 +58,12 @@ def upsample_dataset(
     dataset._scale(standardize=True)
     data = dataset.train_x
     targets = dataset.train_y
+
+    # shuffle the data
+    idx = np.random.permutation(len(data))
+    data = data[idx]
+    targets = targets[idx]
+    
     return data, targets
 
     

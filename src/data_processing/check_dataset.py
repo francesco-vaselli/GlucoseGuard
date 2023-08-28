@@ -32,6 +32,11 @@ print(train_x.shape, train_y.shape)
 ds = filter_stationary_sequences_dataset(ds)
 train_x = ds[:, :7]
 train_y = ds[:, 7:]
+# check for nans/infs
+print(np.any(np.isnan(train_x)))
+print(np.any(np.isnan(train_y)))
+print(np.any(np.isinf(train_x)))
+print(np.any(np.isinf(train_y)))
 # filter_stationary_sequences(train_x, train_y)
 print(train_x.shape, train_y.shape)
 # restore mean and std

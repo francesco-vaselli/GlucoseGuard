@@ -6,7 +6,6 @@ theme:
       warning: material/alert
 
 site_name: GlucoseGuard
-# "GlucoseGuard: A Time-Series Approach to Predicting Blood Sugar Levels"
 site_url: https://francesco-vaselli.github.io/GlucoseGuard/
 
 nav:

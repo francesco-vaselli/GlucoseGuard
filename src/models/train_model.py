@@ -360,8 +360,8 @@ def main():
         learning_rate,
         model_config,
         log_name,
-        save_model=True,
-        transfer_learning=False,
+        save_model,
+        transfer_learning,
     )
 
 

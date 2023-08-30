@@ -22,7 +22,7 @@ def train_transfer(data_path, mean, std, log_name, batch_size, epochs, model):
     n_train = 10000
     n_val = 2000
     n_test = 6000
-    train_x = ds[:, :7]
+    train_x = ds[:n_train, :7]
     train_y = ds[:n_train, 7:]
     val_x = ds[n_train : n_train + n_val, :7]
     val_y = ds[n_train : n_train + n_val, 7:]

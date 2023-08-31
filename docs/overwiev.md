@@ -1,3 +1,4 @@
+
 Our dataset is composed of multiple .json files per patient. Each patient is identified by a unique ID.
 In the following we describe the steps which we have used to extract the raw data from the files, preprocess it and optionally upsampling it.
 

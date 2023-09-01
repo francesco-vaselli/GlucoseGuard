@@ -98,6 +98,7 @@ def build_dataset(
     targets = train_dataset.train_y
 
     if standardize_by_ref:
+        print("Standardizing by reference")
         mean = standardize_params["mean"]
         std = standardize_params["std"]
         data = (data - mean) / std
@@ -146,7 +147,7 @@ def main(data_config):
 
     # save data and targets as numpy arrays, in same file
     dataset = np.concatenate((data, targets), axis=1)
-    np.save("dataset_99908129.npy", dataset)
+    np.save("dataset_99908129_smooth_up.npy", dataset)
     # dataset = tf.data.Dataset.from_tensor_slices((data, targets))
     # save
     # dataset.save("data/dataset")

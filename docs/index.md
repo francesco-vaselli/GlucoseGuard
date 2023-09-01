@@ -27,11 +27,11 @@ The reliable prediction of glucose levels in diabetes patients remains a pivotal
 
 ### Methodological Innovations
 
-The research paper introduces a revolutionary approach that deploys deep transfer learning and data augmentation techniques to ameliorate the inherent challenges in existing models. Deep transfer learning allows the model to benefit from pre-trained networks, thereby reducing the need for extensive datasets. Data augmentation, on the other hand, mitigates the challenges posed by data imbalance by generating synthetic data points for under-represented glucose events, such as spikes or drops.
+The research paper introduces a robust approach that deploys deep transfer learning and data augmentation techniques to ameliorate the inherent challenges in existing models. Deep transfer learning allows the model to benefit from pre-trained networks, thereby reducing the need for extensive datasets. Data augmentation, on the other hand, mitigates the challenges posed by data imbalance by generating synthetic data points for under-represented glucose events, such as spikes or drops.
 
 ### Findings
 
-The model proposed by Deng et al. has achieved a predictive accuracy exceeding 95%. This robust level of accuracy has profound implications for real-time monitoring systems and clinical practices. It offers the potential for more personalized healthcare interventions and significantly reduces the risks associated with erratic glucose levels.
+The model proposed by Deng et al. has achieved a predictive accuracy exceeding 95%. This high level of accuracy has profound implications for real-time monitoring systems and clinical practices. It offers the potential for more personalized healthcare interventions and significantly reduces the risks associated with erratic glucose levels. Due to the *unbalanced* nature of the problem, where hypoglycemic events are a fraction of the dataset, other predictive measures become important. In particular, the *precision* $\frac{TP}{TP+FP}$ and the *sensitivity* $\frac{TP}{TP+FN}$ of the best model proposed in the paper are 67.68% and 59.19%, showing that there is still room for improvement.
 
 
 [^1]: Francesco Vaselli, PhD candidate at Scuola Normale Superiore, francesco.vaselli at sns.it

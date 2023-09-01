@@ -9,14 +9,14 @@ To ascertain the efficacy of our models, we compared our results with those from
 
 **We note that our results surpass those of the reference paper and of other notable works in the field**. This is true even for the basic models, which do not leverage data augmentation or transfer learning. We attribute this to the high quantity and good quality of training data at our disposal, showing again the key importance of data when working with ML models.
 
-| Metrics       |  ARIMA       |    GP     |   CNN (Basic)     |   RNN (Basic)    |   Attention (Basic)    | Ref paper     | Bevan et al[^1] |
+| Metrics       |  ARIMA       |    GP     |   CNN (Basic)     |   RNN (Basic)    |   Attention (Basic)    | Ref paper (Best)     | Bevan et al[^1] |
 |---------------|---------|---------|---------|---------|---------|----------|----------------|
-| Accuracy      |         |         |         |         |         | 95.98%   | 95.65%         |
-| F1 score      |         |         |         |         |         | 61.72%   | 57.40%         |
-| Sensitivity   |         |         |         |         |         | 59.19%   | 49.94%         |
-| Precision (PPV)|        |         |         |         |         | 67.68%   | 69.00%         |
-| Specificity   |         |         |         |         |         | 98.15%   | 98.61%         |
-| NPV           |         |         |         |         |         | 97.55%   | 96.76%         |
+| Accuracy      |         |         |   97.21%      |   **97.44%**      |  97.07%       | 95.98%   | 95.65%         |
+| F1 score      |         |         |   79.46%      |   **80.77%**      |  78.52%       | 61.72%   | 57.40%         |
+| Sensitivity   |         |         |   **80.44%**      |   80.16%      |  75.38%       | 59.19%   | 49.94%         |
+| Precision (PPV)|        |         |   78.51%     |   81.39%      |   **81.94%**      | 67.68%   | 69.00%         |
+<!-- | Specificity   |         |         |         |         |         | 98.15%   | 98.61%         |
+| NPV           |         |         |         |         |         | 97.55%   | 96.76%         | -->
 
 
 ## Bayesian Hyperparameter Tuning with Keras

@@ -1,11 +1,11 @@
 In the realm of machine learning for healthcare, class imbalance is a recurrent issue. The minority class—here, critical hypoglycemic events—is often underrepresented, which could lead to poor generalization and biased predictions towards the majority class. Augmentation strategies serve as vital countermeasures, enhancing the robustness of the model by artificially inflating the training dataset with synthetic but plausible examples. This is particularly crucial for applications like CGM data forecasting, where overlooking a rare hypoglycemic event could have serious health implications.
 
-# Augmentation Strategies
-## Gaussian Noise
+## Augmentation Strategies
+### Gaussian Noise
 
 To mitigate overfitting and to make the model more resilient to the innate noise in CGM data, Gaussian noise with a mean of 0 and a variance of 3 was added solely to the input sequences during training. This technique is predicated on the notion that similar input sequences should yield similar behavior; therefore, small perturbations around a true reading should not dramatically alter the forecast. This injects an element of stochasticity into the model, helping it to generalize better to unseen data.
 
-## MixUp
+### MixUp
 
 Originating from the work by Zhang et al[^1], MixUp is an augmentation strategy that has garnered attention for its efficacy in enhancing neural network generalization. The method involves linearly interpolating between samples in the training dataset according to the formula:
 

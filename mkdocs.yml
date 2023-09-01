@@ -10,9 +10,18 @@ site_url: https://francesco-vaselli.github.io/GlucoseGuard/
 
 nav:
     - Home: index.md
-    - Preprocessing: preprocessing.md
-    - Models and Trainings: trainings.md
-    - Results: results.md
+    - Data and Preprocessing: 
+      - Overview: overview.md
+      - Preprocessing: preprocessing.md
+      - Data Augmentation: upsampling.md
+      - Codebase: codebase.md
+    - Models and Results: 
+      - Overview: overview1.md
+      - Baseline Models: baseline_models.md
+      - CNN: cnn.md
+      - RNN: rnn.md
+      - Attention Network: attention.md
+    - Improvements: improvements.md
 
 
 

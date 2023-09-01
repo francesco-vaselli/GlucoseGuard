@@ -327,8 +327,8 @@ def main():
     data_mean = config["data_mean"]
     data_std = config["data_std"]
     transfer_data_path = config["transfer_data_path"]
-    transfer_data_mean = config["transfer_data_mean"]
-    transfer_data_std = config["transfer_data_std"]
+    transfer_data_mean = data_mean
+    transfer_data_std = data_std
     n_train = config["n_train"]
     n_val = config["n_val"]
     n_test = config["n_test"]

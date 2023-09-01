@@ -174,11 +174,15 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
             tn, fp, fn, tp = confusion_matrix(true_label, pred_label).ravel()
             accuracy = (tn + tp) / (tn + fp + fn + tp)
             sensitivity = tp / (tp + fn)
+            specificity = tn / (tn + fp)
             precision = tp / (tp + fp)
+            npv = tn / (tn + fn)
             f1 = tp / (tp + 1 / 2 * (fp + fn))
             tf.summary.scalar("Accuracy", accuracy, step=epoch)
             tf.summary.scalar("Sensitivity", sensitivity, step=epoch)
+            tf.summary.scalar("Specificity", specificity, step=epoch)
             tf.summary.scalar("Precision", precision, step=epoch)
+            tf.summary.scalar("NPV", npv, step=epoch)
             tf.summary.scalar("F1", f1, step=epoch)
 
             # Log ROC curve

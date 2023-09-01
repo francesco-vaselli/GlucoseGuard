@@ -22,6 +22,8 @@ def build_dataset(
     cutpoint,
     augmentation=None,
     augmentation_params=None,
+    standardize_by_ref=False,
+    standardize_params=None,
 ):
     # read in all patients data
     train_data = dict()
@@ -94,6 +96,13 @@ def build_dataset(
         
     data = train_dataset.train_x
     targets = train_dataset.train_y
+
+    if standardize_by_ref:
+        mean = standardize_params["mean"]
+        std = standardize_params["std"]
+        data = (data - mean) / std
+        targets = (targets - mean) / std
+    
     return data, targets
 
 def main(data_config):
@@ -114,6 +123,8 @@ def main(data_config):
     cutpoint = config["cutpoint"]
     augmentation = config["augmentation"]
     augmentation_params = config["augmentation_params"]
+    standardize_by_ref = config["standardize_by_ref"]
+    standardize_params = config["standardize_params"]
 
     data, targets = build_dataset(
         data_dir,
@@ -129,11 +140,13 @@ def main(data_config):
         cutpoint,
         augmentation,
         augmentation_params,
+        standardize_by_ref,
+        standardize_params,
     )
 
     # save data and targets as numpy arrays, in same file
     dataset = np.concatenate((data, targets), axis=1)
-    np.save("dataset_64406000.npy", dataset)
+    np.save("dataset_99908129.npy", dataset)
     # dataset = tf.data.Dataset.from_tensor_slices((data, targets))
     # save
     # dataset.save("data/dataset")

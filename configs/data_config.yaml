@@ -137,7 +137,7 @@ ids: ['72492570',
       '88004055',
       '96254963',
       '47750728',]
-test_ids: ['64406000']
+test_ids: ['99908129']
       
       #    '99908129',]
       # '63047517',
@@ -156,7 +156,11 @@ smooth: False
 # target_weight
 target_weight: 1
 # standardize
-standardize: True
+standardize: False
+standardize_by_ref: True
+standardize_params:
+  mean: 144.982
+  std: 57.941
 # Computed Mean: 144.98199462890625, Computed Std: 58.11943817138672
 # dataset smooth Computed Mean: 144.98204040527344, Computed Std: 57.940860748291016
 # cutpoint (negative= take all the data)
@@ -167,6 +171,7 @@ augmentation: null
 augmentation_params:
   num_augmentations: 1
   padding: "History"
+
 
 
 

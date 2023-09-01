@@ -5,7 +5,7 @@ Subsequently, we ventured into the domain of deep learning, employing architectu
 
 ## Comparison of Results
 
-To ascertain the efficacy of our models, we compared our results with those from the reference paper. The key metrics for the binary classification task with a prediction horizon of 30 minutes ([Table 1 of Reference Paper](https://www.nature.com/articles/s41746-021-00480-x/tables/1)) are summarized in the table below. 
+To ascertain the efficacy of our models, we compared our results with those from the reference paper. The key metrics for the binary classification task with a prediction horizon of 30 minutes ([Table 1 of Reference Paper](https://www.nature.com/articles/s41746-021-00480-x/tables/1)) are summarized in the table below. We are unable to compare the loss scores as we use a different dataset.
 
 **We note that our results surpass those of the reference paper and of other notable works in the field**. This is true even for the basic models, which do not leverage data augmentation or transfer learning. We attribute this to the high quantity and good quality of training data at our disposal, showing again the key importance of data when working with ML models.
 

@@ -1,6 +1,3 @@
-
-# The Imperative for Augmentation in Unbalanced Training Cases
-
 In the realm of machine learning for healthcare, class imbalance is a recurrent issue. The minority class—here, critical hypoglycemic events—is often underrepresented, which could lead to poor generalization and biased predictions towards the majority class. Augmentation strategies serve as vital countermeasures, enhancing the robustness of the model by artificially inflating the training dataset with synthetic but plausible examples. This is particularly crucial for applications like CGM data forecasting, where overlooking a rare hypoglycemic event could have serious health implications.
 
 # Augmentation Strategies
@@ -19,6 +16,6 @@ $$
 
 Here, $\lambda$ is a hyperparameter following the Beta distribution, Beta($\alpha$,$\alpha$), and $x_i$, $x_j$​ denote inputs from two different samples, respectively. In our application, we constrain MixUp to the minority class, specifically those with $(x, \; y)<80$, to counterbalance the dataset.
 
-The hyperparameter $\alpha$ is a sensitive knob controlling the diversity of synthetic samples. Higher values produce samples more resembling to the reference real data while lower ones introduce samples very different from the reference real data.  The reference work examined $\alpha = 0.4$ and $\alpha = 2$ in twofold MixUp and found improvements in both positive predictive value (PPV) and sensitivity for the minority class across various prediction horizons. We employed $\alpha = 2$
+The hyperparameter $\alpha$ is a sensitive knob controlling the diversity of synthetic samples. Higher values produce samples more resembling to the reference real data while lower ones introduce samples very different from the reference real data.  The reference work examined $\alpha = 0.4$ and $\alpha = 2$ in twofold MixUp and found improvements in both positive predictive value (PPV) and sensitivity for the minority class across various prediction horizons. We employed $\alpha = 2$.
 
 [^1]: https://arxiv.org/abs/1710.09412

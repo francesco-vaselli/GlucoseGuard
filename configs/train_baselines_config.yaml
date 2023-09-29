@@ -1,0 +1,22 @@
+data:
+  path: "./data/dataset_smooth.npy"
+  n_train: 3000000
+  n_val: 100
+  n_test: 100
+  mean: 144.98204040527344
+  std: 57.940860748291016
+arima:
+  p: 5
+  d: 1
+  q: 0
+# gp_config
+gp:
+  kernel:
+    constant: 1.0
+    constant_bounds: [0.001, 1000]
+    rbf: 10
+    rbf_bounds: [0.01, 100]
+  n_restarts_optimizer: 10
+
+metrics:
+  threshold: 80

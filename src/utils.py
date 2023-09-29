@@ -5,7 +5,56 @@ import numpy as np
 from tensorflow.keras.callbacks import TensorBoard
 from sklearn.metrics import confusion_matrix, roc_curve, auc
 import itertools
+import seaborn as sns
+from scipy.signal import correlate
+import pandas as pd
+import statsmodels.api as sm
 
+def check_dataset_correlations(train_x, train_y, save_path):
+    concatenated_data = np.concatenate((train_x.flatten(), train_y.flatten()))
+
+    # Create ACF and PACF plots
+    fig = plt.figure(figsize=(12, 8))
+    ax1 = fig.add_subplot(211)
+    fig = sm.graphics.tsa.plot_acf(concatenated_data, lags=40, ax=ax1)
+    ax2 = fig.add_subplot(212)
+    fig = sm.graphics.tsa.plot_pacf(concatenated_data, lags=40, ax=ax2)
+    # save fig
+    plt.savefig(save_path + "acf_pacf_total.png")
+    plt.close()
+
+    # Create ACF and PACF plots just for train_y
+    fig = plt.figure(figsize=(12, 8))
+    ax1 = fig.add_subplot(211)
+    fig = sm.graphics.tsa.plot_acf(train_y.flatten(), lags=10, ax=ax1)
+    ax2 = fig.add_subplot(212)
+    fig = sm.graphics.tsa.plot_pacf(train_y.flatten(), lags=10, ax=ax2)
+    # save fig
+    plt.savefig(save_path + "acf_pacf_train_y.png")
+    plt.close()
+
+    cross_corr = correlate(train_y.flatten(), train_x.flatten(), mode='full')
+    lags = np.arange(-len(train_y) + 1, len(train_x))
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(lags, cross_corr)
+    plt.title('Cross-Correlation between train_x and train_y')
+    plt.xlabel('Lag')
+    plt.ylabel('Correlation Coefficient')
+    plt.savefig(save_path + "cross_corr_train_x_train_y.png")
+
+
+    df_combined = pd.DataFrame(concatenated_data, columns=[f'x_{i}' for i in range(train_x.shape[1])] + [f'y_{i}' for i in range(train_y.shape[1])])
+
+    # Calculate correlation matrix
+    corr = df_combined.corr()
+
+    # Generate a heatmap
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(corr, annot=True, cmap='coolwarm')
+    plt.title('Correlation Heatmap between train_x and train_y')
+    plt.savefig(save_path + "corr_heatmap_train_x_train_y.png")
+    plt.close()
 
 def filter_stationary_sequences_dataset(ds):
     mask = np.ones(len(ds), dtype=bool)

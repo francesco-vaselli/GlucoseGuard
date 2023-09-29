@@ -80,7 +80,7 @@ def load_config(config_path):
 
 
 # Load YAML Config
-config = load_config("config.yaml")
+config = load_config("configs/train_baselines_config.yaml")
 
 
 # Your existing evaluation functions like plot_confusion_matrix, plot_roc_curve, check_classification...

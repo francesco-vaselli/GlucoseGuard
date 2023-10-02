@@ -12,9 +12,11 @@ import statsmodels.api as sm
 
 
 def check_dataset_correlations(train_x, train_y, save_path):
+    print("check_dataset_correlations")
     concatenated_data = np.concatenate((train_x.flatten(), train_y.flatten()))
 
     # Create ACF and PACF plots
+    print("Create ACF and PACF plots")
     fig = plt.figure(figsize=(12, 8))
     ax1 = fig.add_subplot(211)
     fig = sm.graphics.tsa.plot_acf(concatenated_data, lags=40, ax=ax1)
@@ -25,6 +27,7 @@ def check_dataset_correlations(train_x, train_y, save_path):
     plt.close()
 
     # Create ACF and PACF plots just for train_y
+    print("Create ACF and PACF plots just for train_y")
     fig = plt.figure(figsize=(12, 8))
     ax1 = fig.add_subplot(211)
     fig = sm.graphics.tsa.plot_acf(train_y.flatten(), lags=10, ax=ax1)
@@ -34,6 +37,7 @@ def check_dataset_correlations(train_x, train_y, save_path):
     plt.savefig(save_path + "acf_pacf_train_y.png")
     plt.close()
 
+    print("Cross-Correlation between train_x and train_y")
     cross_corr = correlate(train_y.flatten(), train_x.flatten(), mode="full")
     lags = np.arange(-len(train_y) + 1, len(train_x))
 
@@ -44,6 +48,7 @@ def check_dataset_correlations(train_x, train_y, save_path):
     plt.ylabel("Correlation Coefficient")
     plt.savefig(save_path + "cross_corr_train_x_train_y.png")
 
+    print("Correlation Heatmap between train_x and train_y")
     df_combined = pd.DataFrame(
         concatenated_data,
         columns=[f"x_{i}" for i in range(train_x.shape[1])]

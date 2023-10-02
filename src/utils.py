@@ -10,6 +10,7 @@ from scipy.signal import correlate
 import pandas as pd
 import statsmodels.api as sm
 
+
 def check_dataset_correlations(train_x, train_y, save_path):
     concatenated_data = np.concatenate((train_x.flatten(), train_y.flatten()))
 
@@ -33,28 +34,32 @@ def check_dataset_correlations(train_x, train_y, save_path):
     plt.savefig(save_path + "acf_pacf_train_y.png")
     plt.close()
 
-    cross_corr = correlate(train_y.flatten(), train_x.flatten(), mode='full')
+    cross_corr = correlate(train_y.flatten(), train_x.flatten(), mode="full")
     lags = np.arange(-len(train_y) + 1, len(train_x))
 
     plt.figure(figsize=(12, 6))
     plt.plot(lags, cross_corr)
-    plt.title('Cross-Correlation between train_x and train_y')
-    plt.xlabel('Lag')
-    plt.ylabel('Correlation Coefficient')
+    plt.title("Cross-Correlation between train_x and train_y")
+    plt.xlabel("Lag")
+    plt.ylabel("Correlation Coefficient")
     plt.savefig(save_path + "cross_corr_train_x_train_y.png")
 
-
-    df_combined = pd.DataFrame(concatenated_data, columns=[f'x_{i}' for i in range(train_x.shape[1])] + [f'y_{i}' for i in range(train_y.shape[1])])
+    df_combined = pd.DataFrame(
+        concatenated_data,
+        columns=[f"x_{i}" for i in range(train_x.shape[1])]
+        + [f"y_{i}" for i in range(train_y.shape[1])],
+    )
 
     # Calculate correlation matrix
     corr = df_combined.corr()
 
     # Generate a heatmap
     plt.figure(figsize=(12, 8))
-    sns.heatmap(corr, annot=True, cmap='coolwarm')
-    plt.title('Correlation Heatmap between train_x and train_y')
+    sns.heatmap(corr, annot=True, cmap="coolwarm")
+    plt.title("Correlation Heatmap between train_x and train_y")
     plt.savefig(save_path + "corr_heatmap_train_x_train_y.png")
     plt.close()
+
 
 def filter_stationary_sequences_dataset(ds):
     mask = np.ones(len(ds), dtype=bool)
@@ -174,7 +179,9 @@ def plot_roc_curve(fpr, tpr, roc_auc):
     return figure
 
 
-def check_classification(true, pred, threshold=80, standard=True, ind=5, std=57.94, mean=144.98):
+def check_classification(
+    true, pred, threshold=80, standard=True, ind=5, std=57.94, mean=144.98
+):
     # Assuming true and pred have shape [batch_size, seq_length, feature_dim]
     # and that the value of interest is the last in the sequence
 
@@ -264,12 +271,14 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
 
 
 class CustomImageLogging(tf.keras.callbacks.Callback):
-    def __init__(self, log_dir, val_dataset, num_samples=3):
+    def __init__(self, log_dir, val_dataset, num_samples=3, std=57.94, mean=144.98):
         super().__init__()
         self.log_dir = log_dir
         self.val_data = val_dataset
         self.num_samples = num_samples
         self.writer = tf.summary.create_file_writer(self.log_dir)
+        self.std = std
+        self.mean = mean
 
     def on_epoch_end(self, epoch, logs=None):
         # if (
@@ -279,28 +288,76 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
         # Get predictions
         x, y_true = next(iter(self.val_data.take(self.num_samples)))
         y_pred = self.model.predict(x)
+        # multiply by std and add mean
+        x = x * self.std + self.mean
+        y_true = y_true * self.std + self.mean
+        y_pred = y_pred * self.std + self.mean
+
         time_intervals_x = np.arange(0, 5 * x[0].shape[0], 5)
         time_intervals_y = np.arange(
             5 * x[0].shape[0], 5 * x[0].shape[0] + 5 * y_true[0].shape[0], 5
         )
+        # cat x and y_true
+        x = np.concatenate((x, y_true), axis=1)
+        time_intervals_full = np.concatenate((time_intervals_x, time_intervals_y))
 
         # Create figures and log them
         for i in range(self.num_samples):
-            fig, ax = plt.subplots(figsize=(12, 6))
+            # fig, ax = plt.subplots(figsize=(12, 6))
 
-            # Plot input time series
-            ax.plot(time_intervals_x, x[i], label="Input Sequence")
+            # # Plot input time series
+            # ax.plot(time_intervals_x, x[i], label="Input Sequence")
 
-            # Plot true and predicted outputs
-            ax.scatter(time_intervals_y, y_true[i], s=100, c="r", label="True")
+            # # Plot true and predicted outputs
+            # ax.scatter(time_intervals_y, y_true[i], s=100, c="r", label="True")
+            # ax.scatter(
+            #     time_intervals_y, y_pred[i], s=100, c="g", marker="X", label="Predicted"
+            # )
+
+            # ax.set_title(f"Example {i+1}")
+            # ax.set_xlabel("Time (minutes)")
+            # ax.set_ylabel("Value")
+            # ax.legend()
+            # specify the figure size
+            fig, ax = plt.subplots(figsize=(10, 6))
+
+            # Plot the actual data points with circle markers
+
             ax.scatter(
-                time_intervals_y, y_pred[i], s=100, c="g", marker="X", label="Predicted"
+                time_intervals_full,
+                x,
+                c="blue",
+                label="Actual Measurements",
+                marker="o",
             )
 
-            ax.set_title(f"Example {i+1}")
-            ax.set_xlabel("Time (minutes)")
-            ax.set_ylabel("Value")
-            ax.legend()
+            # Plot the predicted data points with circle markers
+
+            ax.scatter(
+                time_intervals_y,
+                y_pred,
+                c="red",
+                label="Predicted Measurements",
+                marker="x",
+            )
+
+            # add vertical line at 31 minutes and write the text "Sampling Time" on left, "Prediction Time" on right
+            # also add arrows pointing left and right
+            ax.axvline(x=31, color="black", linestyle="--")
+            ax.text(
+                0.35, 0.85, "Sampling \n Horizon", transform=ax.transAxes, fontsize=15
+            )
+            ax.text(
+                0.55, 0.85, "Prediction \n Horizon", transform=ax.transAxes, fontsize=15
+            )
+
+            # Add labels and title
+
+            ax.set_xlabel("Time (minutes)", fontsize=15)
+
+            ax.set_ylabel("Blood Glucose Level (mg/dL)", fontsize=15)
+
+            ax.set_title("Blood Glucose Level Over Time", fontsize=15)
 
             with self.writer.as_default():
                 tf.summary.image(

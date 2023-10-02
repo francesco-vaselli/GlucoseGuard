@@ -9,6 +9,7 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 from sklearn.metrics import mean_squared_error
 from src.utils import filter_stationary_sequences_dataset, check_dataset_correlations
+import pickle
 
 
 def load_data(data_path, n_train, n_val, n_test):
@@ -32,6 +33,7 @@ def train_evaluate_arima(
         train_y, order=order, exog=train_x
     )  # note the `exog` parameter for including additional features
     model_fit = model.fit()
+    pickle.dump(model_fit, open("saved_models/arima_model.pkl", "wb"))
 
     # Validate the model
     predictions_val = model_fit.forecast(steps=len(val_y), exog=val_x)
@@ -59,6 +61,7 @@ def train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_yconfig):
 
     # Fit GP model using training features and targets
     gp.fit(train_x, train_y)
+    pickle.dump(gp, open("saved_models/gp_model.pkl", "wb"))
 
     # Validate the model
     y_pred_mean, y_pred_std = gp.predict(val_x, return_std=True)
@@ -71,6 +74,80 @@ def train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_yconfig):
     print(f"Test MSE for GP model: {mse_test}")
 
     return y_pred_mean_test
+
+
+def plot_beautiful_fig(x, y_true, y_pred, title, save_path, mean, std):
+    # multiply by std and add mean
+    x = x * std + mean
+    y_true = y_true * std + mean
+    y_pred = y_pred * std + mean
+
+    time_intervals_x = np.arange(0, 5 * x[0].shape[0], 5)
+    time_intervals_y = np.arange(
+        5 * x[0].shape[0], 5 * x[0].shape[0] + 5 * y_true[0].shape[0], 5
+    )
+    # cat x and y_true
+    x = np.concatenate((x, y_true), axis=1)
+    time_intervals_full = np.concatenate((time_intervals_x, time_intervals_y))
+
+    # Create figures and log them
+    for i in range(x.shape[1]):
+        # fig, ax = plt.subplots(figsize=(12, 6))
+
+        # # Plot input time series
+        # ax.plot(time_intervals_x, x[i], label="Input Sequence")
+
+        # # Plot true and predicted outputs
+        # ax.scatter(time_intervals_y, y_true[i], s=100, c="r", label="True")
+        # ax.scatter(
+        #     time_intervals_y, y_pred[i], s=100, c="g", marker="X", label="Predicted"
+        # )
+
+        # ax.set_title(f"Example {i+1}")
+        # ax.set_xlabel("Time (minutes)")
+        # ax.set_ylabel("Value")
+        # ax.legend()
+        # specify the figure size
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        # Plot the actual data points with circle markers
+
+        ax.scatter(
+            time_intervals_full,
+            x,
+            c="blue",
+            label="Actual Measurements",
+            marker="o",
+        )
+
+        # Plot the predicted data points with circle markers
+
+        ax.scatter(
+            time_intervals_y,
+            y_pred,
+            c="red",
+            label="Predicted Measurements",
+            marker="x",
+        )
+
+        # add vertical line at 31 minutes and write the text "Sampling Time" on left, "Prediction Time" on right
+        # also add arrows pointing left and right
+        ax.axvline(x=31, color="black", linestyle="--")
+        ax.text(0.35, 0.85, "Sampling \n Horizon", transform=ax.transAxes, fontsize=15)
+        ax.text(
+            0.55, 0.85, "Prediction \n Horizon", transform=ax.transAxes, fontsize=15
+        )
+
+        # Add labels and title
+
+        ax.set_xlabel("Time (minutes)", fontsize=15)
+
+        ax.set_ylabel("Blood Glucose Level (mg/dL)", fontsize=15)
+
+        ax.set_title("Blood Glucose Level Over Time", fontsize=15)
+
+        # save
+        fig.savefig(f"{save_path}{title}_{i}.png")
 
 
 def load_config(config_path):
@@ -169,6 +246,18 @@ if __name__ == "__main__":
         test_y,
         order=(config["arima"]["p"], config["arima"]["d"], config["arima"]["q"]),
     )
+    # save arima model
+
+
+    plot_beautiful_fig(
+        test_x[:3],
+        true_label_arima[:3],
+        pred_label_arima[:3],
+        "arima_figs",
+        "baseline_figures/",
+        config["data"]["mean"],
+        config["data"]["std"],
+    )
     # Further Evaluation for ARIMA
     (
         fpr,
@@ -201,6 +290,17 @@ if __name__ == "__main__":
     true_label_gp = test_y
     pred_label_gp = train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_y)
 
+    plot_beautiful_fig(
+        test_x[:3],
+        test_y[:3],
+        pred_label_gp[:3],
+        "gp_figs",
+        "baseline_figures/",
+        config["data"]["mean"],
+        config["data"]["std"],
+    )
+    # save gp model
+
     # Further Evaluation for GP
     # Similar to what we did for ARIMA
     (
@@ -229,3 +329,5 @@ if __name__ == "__main__":
         f.write(
             f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
         )
+
+

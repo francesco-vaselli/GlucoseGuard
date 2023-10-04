@@ -119,7 +119,7 @@ def plot_beautiful_fig(x, y_true, y_pred, title, save_path, mean, std):
     time_intervals_full = np.concatenate((time_intervals_x, time_intervals_y))
 
     # Create figures and log them
-    for i in range(x.shape[1]):
+    for i in range(x.shape[0]):
         # fig, ax = plt.subplots(figsize=(12, 6))
 
         # # Plot input time series

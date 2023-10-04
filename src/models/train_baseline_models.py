@@ -241,6 +241,8 @@ def check_classification(
     f1 = tp / (tp + 1 / 2 * (fp + fn))
 
     return (
+        true_label,
+        pred_label,
         fpr,
         tpr,
         roc_auc,
@@ -332,6 +334,8 @@ if __name__ == "__main__":
     # Further Evaluation for GP
     # Similar to what we did for ARIMA
     (
+        true_label_gp,
+        pred_label_gp,
         fpr,
         tpr,
         roc_auc,
@@ -376,6 +380,8 @@ if __name__ == "__main__":
     # Further Evaluation for SVM
     # Similar to what we did for ARIMA
     (
+        true_label_svm,
+        pred_label_svm,
         fpr,
         tpr,
         roc_auc,

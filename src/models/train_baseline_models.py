@@ -7,14 +7,18 @@ import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 from src.utils import filter_stationary_sequences_dataset, check_dataset_correlations
 import pickle
+from sklearn.svm import SVR
 
 
 def load_data(data_path, n_train, n_val, n_test):
     ds = np.load(data_path)
     ds = filter_stationary_sequences_dataset(ds)
+
+    # shuffle
+    np.random.shuffle(ds)
 
     train_x = ds[:n_train, :7]
     train_y = ds[:n_train, 7:]
@@ -47,7 +51,7 @@ def train_evaluate_arima(
     return predictions_test
 
 
-def train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_yconfig):
+def train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_y, config):
     constant_value = config["gp"]["kernel"]["constant"]
     constant_bounds = tuple(config["gp"]["kernel"]["constant_bounds"])
     rbf_value = config["gp"]["kernel"]["rbf"]
@@ -65,16 +69,40 @@ def train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_yconfig):
 
     # Validate the model
     y_pred_mean, y_pred_std = gp.predict(val_x, return_std=True)
-    mse_val = mean_squared_error(val_y, y_pred_mean)
-    print(f"Validation MSE for GP model: {mse_val}")
+    mse_val = mean_absolute_error(val_y, y_pred_mean)
+    print(f"Validation MAE for GP model: {mse_val}")
 
     # Test the model
     y_pred_mean_test, y_pred_std_test = gp.predict(test_x, return_std=True)
-    mse_test = mean_squared_error(test_y, y_pred_mean_test)
-    print(f"Test MSE for GP model: {mse_test}")
+    mse_test = mean_absolute_error(test_y, y_pred_mean_test)
+    print(f"Test MAE for GP model: {mse_test}")
 
     return y_pred_mean_test
 
+def train_evaluate_svm(train_x, train_y, val_x, val_y, test_x, test_y, config):
+    # Configure the SVR model
+    kernel = config["svm"]["kernel"]
+    C = config["svm"]["C"]
+    gamma = config["svm"]["gamma"]
+    svm_model = SVR(kernel=kernel, C=C, gamma=gamma)
+    
+    # Fit the SVR model
+    svm_model.fit(train_x, train_y.ravel())  # ravel() is used to flatten y for fitting
+    
+    # Save the model
+    pickle.dump(svm_model, open("saved_models/svm_model.pkl", "wb"))
+
+    # Validate the model
+    y_pred_val = svm_model.predict(val_x)
+    mse_val = mean_absolute_error(val_y, y_pred_val)
+    print(f"Validation MAE for SVM model: {mse_val}")
+
+    # Test the model
+    y_pred_test = svm_model.predict(test_x)
+    mse_test = mean_absolute_error(test_y, y_pred_test)
+    print(f"Test MAE for SVM model: {mse_test}")
+
+    return y_pred_test
 
 def plot_beautiful_fig(x, y_true, y_pred, title, save_path, mean, std):
     # multiply by std and add mean
@@ -179,7 +207,7 @@ def plot_confusion_matrix(cm, class_names):
         color = "black"
         plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
 
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
     return figure
@@ -323,11 +351,53 @@ if __name__ == "__main__":
     cm = confusion_matrix(true_label_gp, pred_label_gp)
     cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
     # save cm_fig
-    cm_fig.savefig("baseline_figures/confusion_matrix.png")
+    plt.savefig("baseline_figures/confusion_matrix_gp.png")
     # save metrics to .txt file
     with open("baseline_figures/metrics_gp.txt", "w") as f:
         f.write(
             f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
         )
 
+    print("------ Support Vector Machine ------")
+    true_label_svm = test_y
+    pred_label_svm = train_evaluate_svm(train_x, train_y, val_x, val_y, test_x, test_y)
 
+    # Use your existing function to plot results
+    plot_beautiful_fig(
+        test_x[:3],
+        test_y[:3],
+        pred_label_svm[:3],
+        "svm_figs",
+        "baseline_figures/",
+        config["data"]["mean"],
+        config["data"]["std"],
+    )
+
+    # Further Evaluation for SVM
+    # Similar to what we did for ARIMA
+    (
+        fpr,
+        tpr,
+        roc_auc,
+        accuracy,
+        sensitivity,
+        specificity,
+        precision,
+        npv,
+        f1,
+    ) = check_classification(
+        true_label_svm,
+        pred_label_svm,
+        threshold=config["metrics"]["threshold"],
+        std=config["data"]["std"],
+        mean=config["data"]["mean"],
+    )
+    cm = confusion_matrix(true_label_svm, pred_label_svm)
+    cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
+    # save cm_fig
+    plt.savefig("baseline_figures/confusion_matrix_svm.png")
+    # save metrics to .txt file
+    with open("baseline_figures/metrics_svm.txt", "w") as f:
+        f.write(
+            f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
+        )

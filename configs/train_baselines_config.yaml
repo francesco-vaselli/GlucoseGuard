@@ -17,6 +17,10 @@ gp:
     rbf: 10
     rbf_bounds: [0.01, 100]
   n_restarts_optimizer: 10
+svm:
+  kernel: rbf
+  C: 1.0
+  gamma: "auto"
 
 metrics:
   threshold: 80

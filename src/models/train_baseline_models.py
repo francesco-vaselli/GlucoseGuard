@@ -142,7 +142,7 @@ def plot_beautiful_fig(x, y_true, y_pred, title, save_path, mean, std):
 
         ax.scatter(
             time_intervals_full,
-            x,
+            x[i, :],
             c="blue",
             label="Actual Measurements",
             marker="o",
@@ -152,7 +152,7 @@ def plot_beautiful_fig(x, y_true, y_pred, title, save_path, mean, std):
 
         ax.scatter(
             time_intervals_y,
-            y_pred,
+            y_pred[i, :],
             c="red",
             label="Predicted Measurements",
             marker="x",

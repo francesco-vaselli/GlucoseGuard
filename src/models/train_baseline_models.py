@@ -11,6 +11,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 from src.utils import filter_stationary_sequences_dataset, check_dataset_correlations
 import pickle
 from sklearn.svm import SVR
+from sklearn.multioutput import RegressorChain
 
 
 def load_data(data_path, n_train, n_val, n_test):
@@ -79,26 +80,27 @@ def train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_y, config):
 
     return y_pred_mean_test
 
-def train_evaluate_svm(train_x, train_y, val_x, val_y, test_x, test_y, config):
+def train_evaluate_chain_svm(train_x, train_y, val_x, val_y, test_x, test_y, config):
     # Configure the SVR model
     kernel = config["svm"]["kernel"]
     C = config["svm"]["C"]
     gamma = config["svm"]["gamma"]
     svm_model = SVR(kernel=kernel, C=C, gamma=gamma)
+    svm_chain_model = RegressorChain(base_estimator=svm_model, order=[i for i in range(train_y.shape[1])])
     
     # Fit the SVR model
-    svm_model.fit(train_x, train_y.ravel())  # ravel() is used to flatten y for fitting
+    svm_chain_model.fit(train_x, train_y.ravel())  # ravel() is used to flatten y for fitting
     
     # Save the model
-    pickle.dump(svm_model, open("saved_models/svm_model.pkl", "wb"))
+    pickle.dump(svm_chain_model, open("saved_models/svm_chain_model.pkl", "wb"))
 
     # Validate the model
-    y_pred_val = svm_model.predict(val_x)
+    y_pred_val = svm_chain_model.predict(val_x)
     mse_val = mean_absolute_error(val_y, y_pred_val)
     print(f"Validation MAE for SVM model: {mse_val}")
 
     # Test the model
-    y_pred_test = svm_model.predict(test_x)
+    y_pred_test = svm_chain_model.predict(test_x)
     mse_test = mean_absolute_error(test_y, y_pred_test)
     print(f"Test MAE for SVM model: {mse_test}")
 
@@ -364,7 +366,7 @@ if __name__ == "__main__":
 
     print("------ Support Vector Machine ------")
     true_label_svm = test_y
-    pred_label_svm = train_evaluate_svm(train_x, train_y, val_x, val_y, test_x, test_y, config)
+    pred_label_svm = train_evaluate_chain_svm(train_x, train_y, val_x, val_y, test_x, test_y, config)
 
     # Use your existing function to plot results
     plot_beautiful_fig(

@@ -16,7 +16,7 @@ gp:
     constant_bounds: [0.001, 1000]
     rbf: 10
     rbf_bounds: [0.01, 100]
-  n_restarts_optimizer: 10
+  n_restarts_optimizer: 30
 svm:
   kernel: rbf
   C: 1.0

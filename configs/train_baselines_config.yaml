@@ -1,6 +1,6 @@
 data:
   path: "./data/dataset_smooth.npy"
-  n_train: 50000
+  n_train: 500
   n_val: 10000
   n_test: 10000
   mean: 144.98204040527344

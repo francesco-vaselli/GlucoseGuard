@@ -38,7 +38,18 @@ $$
 | C              | 1.0   |
 | Gamma          | auto  |
 
+## More Results
+
 Aside from the scores reported [in the overview](https://francesco-vaselli.github.io/GlucoseGuard/overview1/), we show here the Confusion Matrix and a regression example for our baseline models
+
+### GP
+![The cm](img/confusion_matrix_gp.png)
+![The ts](img/gp_figs_1.png)
+
+### SVM
+![The cm](img/confusion_matrix_svm.png)
+![The ts](img/svm_figs_2.png)
+
 
 [^1]: https://scikit-learn.org/stable/modules/gaussian_process.html#gaussian-process 
 [^2]: https://scikit-learn.org/stable/modules/svm.html#svm

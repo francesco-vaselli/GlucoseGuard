@@ -13,6 +13,8 @@ import pickle
 from sklearn.svm import SVR
 from sklearn.multioutput import RegressorChain
 
+# fix np random seed for reproducibility
+np.random.seed(42)
 
 def load_data(data_path, n_train, n_val, n_test):
     ds = np.load(data_path)

@@ -141,7 +141,7 @@ def train_transfer(data_path, mean, std, log_name, batch_size, epochs, model):
     return model, history
 
 
-def plot_confusion_matrix(cm, class_names):
+def plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"]):
     figure = plt.figure(figsize=(8, 8))
     plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
     plt.title("Confusion matrix")
@@ -159,7 +159,7 @@ def plot_confusion_matrix(cm, class_names):
         color = "black"
         plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
 
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
     return figure

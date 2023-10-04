@@ -6,7 +6,7 @@ import yaml
 import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+from sklearn.gaussian_process.kernels import ConstantKernel as C, WhiteKernel, RBF
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from src.utils import filter_stationary_sequences_dataset, check_dataset_correlations
 import pickle
@@ -53,13 +53,16 @@ def train_evaluate_arima(
 
 
 def train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_y, config):
+    # Kernel setup
     constant_value = config["gp"]["kernel"]["constant"]
     constant_bounds = tuple(config["gp"]["kernel"]["constant_bounds"])
     rbf_value = config["gp"]["kernel"]["rbf"]
     rbf_bounds = tuple(config["gp"]["kernel"]["rbf_bounds"])
-    n_restarts_optimizer = config["gp"]["n_restarts_optimizer"]
+    white_noise = config["gp"]["kernel"]["white_noise"]
+    white_noise_bounds = tuple(config["gp"]["kernel"]["white_noise_bounds"])
 
-    kernel = C(constant_value, constant_bounds) * RBF(rbf_value, rbf_bounds)
+    kernel = C(constant_value, constant_bounds) * RBF(rbf_value, rbf_bounds) + WhiteKernel(white_noise, white_noise_bounds)
+
     gp = GaussianProcessRegressor(
         kernel=kernel, n_restarts_optimizer=n_restarts_optimizer
     )
@@ -80,17 +83,20 @@ def train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_y, config):
 
     return y_pred_mean_test
 
+
 def train_evaluate_chain_svm(train_x, train_y, val_x, val_y, test_x, test_y, config):
     # Configure the SVR model
     kernel = config["svm"]["kernel"]
     C = config["svm"]["C"]
     gamma = config["svm"]["gamma"]
     svm_model = SVR(kernel=kernel, C=C, gamma=gamma)
-    svm_chain_model = RegressorChain(base_estimator=svm_model, order=[i for i in range(train_y.shape[1])])
-    
+    svm_chain_model = RegressorChain(
+        base_estimator=svm_model, order=[i for i in range(train_y.shape[1])]
+    )
+
     # Fit the SVR model
-    svm_chain_model.fit(train_x, train_y) 
-    
+    svm_chain_model.fit(train_x, train_y)
+
     # Save the model
     pickle.dump(svm_chain_model, open("saved_models/svm_chain_model.pkl", "wb"))
 
@@ -105,6 +111,7 @@ def train_evaluate_chain_svm(train_x, train_y, val_x, val_y, test_x, test_y, con
     print(f"Test MAE for SVM model: {mse_test}")
 
     return y_pred_test
+
 
 def plot_beautiful_fig(x, y_true, y_pred, title, save_path, mean, std):
     # multiply by std and add mean
@@ -122,21 +129,6 @@ def plot_beautiful_fig(x, y_true, y_pred, title, save_path, mean, std):
 
     # Create figures and log them
     for i in range(x.shape[0]):
-        # fig, ax = plt.subplots(figsize=(12, 6))
-
-        # # Plot input time series
-        # ax.plot(time_intervals_x, x[i], label="Input Sequence")
-
-        # # Plot true and predicted outputs
-        # ax.scatter(time_intervals_y, y_true[i], s=100, c="r", label="True")
-        # ax.scatter(
-        #     time_intervals_y, y_pred[i], s=100, c="g", marker="X", label="Predicted"
-        # )
-
-        # ax.set_title(f"Example {i+1}")
-        # ax.set_xlabel("Time (minutes)")
-        # ax.set_ylabel("Value")
-        # ax.legend()
         # specify the figure size
         fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -175,6 +167,8 @@ def plot_beautiful_fig(x, y_true, y_pred, title, save_path, mean, std):
         ax.set_ylabel("Blood Glucose Level (mg/dL)", fontsize=15)
 
         ax.set_title("Blood Glucose Level Over Time", fontsize=15)
+
+        ax.legend(loc="upper left", fontsize=15)
 
         # save
         fig.savefig(f"{save_path}{title}_{i}.png")
@@ -265,62 +259,12 @@ if __name__ == "__main__":
         config["data"]["n_val"],
         config["data"]["n_test"],
     )
-    # check_dataset_correlations(train_x, train_y, "baseline_figures/")
-
-    # print("------ ARIMA ------")
-    # true_label_arima = test_y
-    # pred_label_arima = train_evaluate_arima(
-    #     train_x,
-    #     train_y,
-    #     val_x,
-    #     val_y,
-    #     test_x,
-    #     test_y,
-    #     order=(config["arima"]["p"], config["arima"]["d"], config["arima"]["q"]),
-    # )
-    # # save arima model
-
-
-    # plot_beautiful_fig(
-    #     test_x[:3],
-    #     true_label_arima[:3],
-    #     pred_label_arima[:3],
-    #     "arima_figs",
-    #     "baseline_figures/",
-    #     config["data"]["mean"],
-    #     config["data"]["std"],
-    # )
-    # # Further Evaluation for ARIMA
-    # (
-    #     fpr,
-    #     tpr,
-    #     roc_auc,
-    #     accuracy,
-    #     sensitivity,
-    #     specificity,
-    #     precision,
-    #     npv,
-    #     f1,
-    # ) = check_classification(
-    #     true_label_arima,
-    #     pred_label_arima,
-    #     threshold=config["metrics"]["threshold"],
-    #     std=config["data"]["std"],
-    #     mean=config["data"]["mean"],
-    # )
-    # cm = confusion_matrix(true_label_arima, pred_label_arima)
-    # cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
-    # # save cm_fig
-    # cm_fig.savefig("baseline_figures/confusion_matrix.png")
-    # # save metrics to .txt file
-    # with open("baseline_figures/metrics_arima.txt", "w") as f:
-    #     f.write(
-    #         f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
-    #     )
 
     print("------ Gaussian Process ------")
     true_label_gp = test_y
-    pred_label_gp = train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_y, config)
+    pred_label_gp = train_evaluate_gp(
+        train_x, train_y, val_x, val_y, test_x, test_y, config
+    )
 
     plot_beautiful_fig(
         test_x[:3],
@@ -366,7 +310,9 @@ if __name__ == "__main__":
 
     print("------ Support Vector Machine ------")
     true_label_svm = test_y
-    pred_label_svm = train_evaluate_chain_svm(train_x, train_y, val_x, val_y, test_x, test_y, config)
+    pred_label_svm = train_evaluate_chain_svm(
+        train_x, train_y, val_x, val_y, test_x, test_y, config
+    )
 
     # Use your existing function to plot results
     plot_beautiful_fig(

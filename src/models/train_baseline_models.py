@@ -18,15 +18,29 @@ def load_data(data_path, n_train, n_val, n_test):
     ds = np.load(data_path)
     ds = filter_stationary_sequences_dataset(ds)
 
-    # shuffle
-    np.random.shuffle(ds)
-
     train_x = ds[:n_train, :7]
     train_y = ds[:n_train, 7:]
     val_x = ds[n_train : n_train + n_val, :7]
     val_y = ds[n_train : n_train + n_val, 7:]
     test_x = ds[n_train + n_val : n_train + n_val + n_test, :7]
     test_y = ds[n_train + n_val : n_train + n_val + n_test, 7:]
+
+    # shuffle AFTER splitting into train/val/test to always get the same splits
+    train_idx = np.arange(train_x.shape[0])
+    np.random.shuffle(train_idx)
+    train_x = train_x[train_idx]
+    train_y = train_y[train_idx]
+
+    val_idx = np.arange(val_x.shape[0])
+    np.random.shuffle(val_idx)
+    val_x = val_x[val_idx]
+    val_y = val_y[val_idx]
+
+    test_idx = np.arange(test_x.shape[0])
+    np.random.shuffle(test_idx)
+    test_x = test_x[test_idx]
+    test_y = test_y[test_idx]
+
     return train_x, train_y, val_x, val_y, test_x, test_y
 
 
@@ -62,7 +76,9 @@ def train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_y, config):
     white_noise_bounds = tuple(config["gp"]["kernel"]["white_noise_bounds"])
     n_restarts_optimizer = config["gp"]["n_restarts_optimizer"]
 
-    kernel = C(constant_value, constant_bounds) * RBF(rbf_value, rbf_bounds) + WhiteKernel(white_noise, white_noise_bounds)
+    kernel = C(constant_value, constant_bounds) * RBF(
+        rbf_value, rbf_bounds
+    ) + WhiteKernel(white_noise, white_noise_bounds)
 
     gp = GaussianProcessRegressor(
         kernel=kernel, n_restarts_optimizer=n_restarts_optimizer

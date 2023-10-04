@@ -11,13 +11,13 @@ arima:
   q: 0
 # gp_config
 gp:
-kernel:
-    constant: 1.0
-    constant_bounds: [0.0001, 5000]
-    rbf: 10
-    rbf_bounds: [0.001, 1000]
-    white_noise: 0.01
-    white_noise_bounds: [1e-5, 1]
+  kernel:
+      constant: 1.0
+      constant_bounds: [0.0001, 5000]
+      rbf: 10
+      rbf_bounds: [0.001, 1000]
+      white_noise: 0.01
+      white_noise_bounds: [1e-5, 1]
   n_restarts_optimizer: 50
 svm:
   kernel: rbf

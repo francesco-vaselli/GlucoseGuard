@@ -89,7 +89,7 @@ def train_evaluate_chain_svm(train_x, train_y, val_x, val_y, test_x, test_y, con
     svm_chain_model = RegressorChain(base_estimator=svm_model, order=[i for i in range(train_y.shape[1])])
     
     # Fit the SVR model
-    svm_chain_model.fit(train_x, train_y.ravel())  # ravel() is used to flatten y for fitting
+    svm_chain_model.fit(train_x, train_y) 
     
     # Save the model
     pickle.dump(svm_chain_model, open("saved_models/svm_chain_model.pkl", "wb"))

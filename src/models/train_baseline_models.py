@@ -233,58 +233,58 @@ if __name__ == "__main__":
         config["data"]["n_val"],
         config["data"]["n_test"],
     )
-    check_dataset_correlations(train_x, train_y, "baseline_figures/")
+    # check_dataset_correlations(train_x, train_y, "baseline_figures/")
 
-    print("------ ARIMA ------")
-    true_label_arima = test_y
-    pred_label_arima = train_evaluate_arima(
-        train_x,
-        train_y,
-        val_x,
-        val_y,
-        test_x,
-        test_y,
-        order=(config["arima"]["p"], config["arima"]["d"], config["arima"]["q"]),
-    )
-    # save arima model
+    # print("------ ARIMA ------")
+    # true_label_arima = test_y
+    # pred_label_arima = train_evaluate_arima(
+    #     train_x,
+    #     train_y,
+    #     val_x,
+    #     val_y,
+    #     test_x,
+    #     test_y,
+    #     order=(config["arima"]["p"], config["arima"]["d"], config["arima"]["q"]),
+    # )
+    # # save arima model
 
 
-    plot_beautiful_fig(
-        test_x[:3],
-        true_label_arima[:3],
-        pred_label_arima[:3],
-        "arima_figs",
-        "baseline_figures/",
-        config["data"]["mean"],
-        config["data"]["std"],
-    )
-    # Further Evaluation for ARIMA
-    (
-        fpr,
-        tpr,
-        roc_auc,
-        accuracy,
-        sensitivity,
-        specificity,
-        precision,
-        npv,
-        f1,
-    ) = check_classification(
-        true_label_arima,
-        pred_label_arima,
-        threshold=config["metrics"]["threshold"],
-        std=config["data"]["std"],
-        mean=config["data"]["mean"],
-    )
-    cm = confusion_matrix(true_label_arima, pred_label_arima)
-    cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
-    # save cm_fig
-    cm_fig.savefig("baseline_figures/confusion_matrix.png")
-    # save metrics to .txt file
-    with open("baseline_figures/metrics_arima.txt", "w") as f:
-        f.write(
-            f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
-        )
+    # plot_beautiful_fig(
+    #     test_x[:3],
+    #     true_label_arima[:3],
+    #     pred_label_arima[:3],
+    #     "arima_figs",
+    #     "baseline_figures/",
+    #     config["data"]["mean"],
+    #     config["data"]["std"],
+    # )
+    # # Further Evaluation for ARIMA
+    # (
+    #     fpr,
+    #     tpr,
+    #     roc_auc,
+    #     accuracy,
+    #     sensitivity,
+    #     specificity,
+    #     precision,
+    #     npv,
+    #     f1,
+    # ) = check_classification(
+    #     true_label_arima,
+    #     pred_label_arima,
+    #     threshold=config["metrics"]["threshold"],
+    #     std=config["data"]["std"],
+    #     mean=config["data"]["mean"],
+    # )
+    # cm = confusion_matrix(true_label_arima, pred_label_arima)
+    # cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
+    # # save cm_fig
+    # cm_fig.savefig("baseline_figures/confusion_matrix.png")
+    # # save metrics to .txt file
+    # with open("baseline_figures/metrics_arima.txt", "w") as f:
+    #     f.write(
+    #         f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
+    #     )
 
     print("------ Gaussian Process ------")
     true_label_gp = test_y

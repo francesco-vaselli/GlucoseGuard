@@ -190,6 +190,7 @@ def plot_beautiful_fig(x, y_true, y_pred, title, save_path, mean, std):
         # save
         fig.savefig(f"{save_path}{title}_{i}.png")
 
+
 def plot_beautiful_fig_gp(x, y_true, y_pred, y_pred_std, title, save_path, mean, std):
     # multiply by std and add mean
     x = x * std + mean
@@ -228,7 +229,25 @@ def plot_beautiful_fig_gp(x, y_true, y_pred, y_pred_std, title, save_path, mean,
             label="Predicted Measurements",
             marker="x",
         )
+        # Add 1-std confidence interval
+        plt.fill_between(
+            time_intervals_y,
+            y_pred[i, :] - y_pred_std[i, :],
+            y_pred[i, :] + y_pred_std[i, :],
+            color="orange",
+            alpha=0.5,
+            label="1-std confidence interval",
+        )
 
+        # Add 3-std confidence interval
+        plt.fill_between(
+            time_intervals_y,
+            y_pred[i, :] - 3 * y_pred_std[i, :],
+            y_pred[i, :] + 3 * y_pred_std[i, :],
+            color="green",
+            alpha=0.2,
+            label="3-std confidence interval",
+        )
         # add vertical line at 31 minutes and write the text "Sampling Time" on left, "Prediction Time" on right
         # also add arrows pointing left and right
         ax.axvline(x=31, color="black", linestyle="--")

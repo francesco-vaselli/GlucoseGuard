@@ -17,7 +17,7 @@ gp:
       rbf: 10
       rbf_bounds: [0.001, 1000]
       white_noise: 0.01
-      white_noise_bounds: [1e-5, 1]
+      white_noise_bounds: [0.00001, 1]
   n_restarts_optimizer: 50
 svm:
   kernel: rbf

@@ -60,6 +60,7 @@ def train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_y, config):
     rbf_bounds = tuple(config["gp"]["kernel"]["rbf_bounds"])
     white_noise = config["gp"]["kernel"]["white_noise"]
     white_noise_bounds = tuple(config["gp"]["kernel"]["white_noise_bounds"])
+    n_restarts_optimizer = config["gp"]["n_restarts_optimizer"]
 
     kernel = C(constant_value, constant_bounds) * RBF(rbf_value, rbf_bounds) + WhiteKernel(white_noise, white_noise_bounds)
 

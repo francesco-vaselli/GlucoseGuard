@@ -9,7 +9,7 @@ To ascertain the efficacy of our models, we compared our results with those from
 
 **We note that our results surpass those of the reference paper and of other notable works in the field**. This is true even for the basic models, which do not leverage data augmentation or transfer learning. We attribute this to the high quantity and good quality of training data at our disposal, showing again the key importance of data when working with ML models.
 
-| Metrics       |  ARIMA       |    GP     |   CNN (Basic)     |   RNN (Basic)    |   Attention (Basic)    | Ref paper (Best)     | Bevan et al[^1] |
+| Metrics       |  GP       |    SVM Chain     |   CNN (Basic)     |   RNN (Basic)    |   Attention (Basic)    | Ref paper (Best)     | Bevan et al[^1] |
 |---------------|---------|---------|---------|---------|---------|----------|----------------|
 | Accuracy      |         |         |   97.21%      |   **97.44%**      |  97.07%       | 95.98%   | 95.65%         |
 | F1 score      |         |         |   79.46%      |   **80.77%**      |  78.52%       | 61.72%   | 57.40%         |

@@ -316,7 +316,7 @@ if __name__ == "__main__":
 
     print("------ Gaussian Process ------")
     true_label_gp = test_y
-    pred_label_gp = train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_y)
+    pred_label_gp = train_evaluate_gp(train_x, train_y, val_x, val_y, test_x, test_y, config)
 
     plot_beautiful_fig(
         test_x[:3],
@@ -360,7 +360,7 @@ if __name__ == "__main__":
 
     print("------ Support Vector Machine ------")
     true_label_svm = test_y
-    pred_label_svm = train_evaluate_svm(train_x, train_y, val_x, val_y, test_x, test_y)
+    pred_label_svm = train_evaluate_svm(train_x, train_y, val_x, val_y, test_x, test_y, config)
 
     # Use your existing function to plot results
     plot_beautiful_fig(

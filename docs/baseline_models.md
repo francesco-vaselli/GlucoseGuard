@@ -9,7 +9,7 @@ Both classes of models are already quite complex and include several hyperparame
 
 For a great in-depth explanation of GP and SVM we refer the reader to the excellent scikit learn Docs.[^1] and [^2]
 
-While for GP we trained a single model, we took advantage of scikit learn *RegressorChain*. It consists of a multi-label model that arranges regressions into a chain.
+While for GP we trained a single model, we trained multiple SVM and took advantage of scikit learn *RegressorChain*. It consists of a multi-label model that arranges regressions into a chain.
 Each model makes a prediction in the order specified by the chain using all of the available features provided to the model plus the predictions of models that are earlier in the chain. This can capture some interdependencies between the output variables, if they exist-- in our use case, we expect future BG reading to have non-trivial dependencies from previous ones. We can actually see that this strategy pays off, not only when compared to results from a single SVM, but also when putting our RegressorChain against more complex and nuanced models.
 
 Finally, we should also note that, due to the long convergence time of these algorithms, especially the GP one, these baseline models were trained on a subset of the available data. The selected Hyperparameters for the baseline models are as follows:

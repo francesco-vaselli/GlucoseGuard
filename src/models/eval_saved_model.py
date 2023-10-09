@@ -197,7 +197,7 @@ def eval():
     cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
     # save cm_fig
     plt.savefig(log_dir+"/confusion_matrix_svm.png")
-    with open(log_dir+"/metrics_svm.txt", "w") as f:
+    with open(log_dir+"/metrics.txt", "w") as f:
         f.write(
             f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
         )

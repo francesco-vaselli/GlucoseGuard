@@ -20,7 +20,7 @@ from src.utils import (
 
 def eval():
 
-    log_name = "your_log_name_here"  # Replace this with the name you used while saving the model
+    log_name = "attn_transf_good"  # Replace this with the name you used while saving the model
     model_path = f"models/{log_name}.h5"
     loaded_model = load_model(model_path)  # If you have custom layers
 

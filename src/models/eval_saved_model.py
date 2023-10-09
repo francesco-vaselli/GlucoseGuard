@@ -171,6 +171,8 @@ def eval():
 
     pred_y = loaded_model.predict(new_test_x)
 
+    new_test_x = new_test_x.reshape(-1, 7)
+
     plot_beautiful_fig(new_test_x[:3], new_test_y[:3], pred_y[:3], "new_test", log_dir, 144.98, 57.94)
     (
         new_test_y,

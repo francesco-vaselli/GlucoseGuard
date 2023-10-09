@@ -30,7 +30,7 @@ def eval():
     ds = filter_stationary_sequences_dataset(ds)
 
     new_test_x = ds[:, :7].reshape(-1, 7, 1)
-    new_test_y = ds[:, 7:].reshape(-1, 1)
+    new_test_y = ds[:, 7:].reshape(-1,6, 1)
     print("train_x shape:", new_test_x.shape)
 
     new_test_dataset = tf.data.Dataset.from_tensor_slices((new_test_x, new_test_y))

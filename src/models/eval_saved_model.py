@@ -21,10 +21,10 @@ from src.utils import (
 def eval():
 
     log_name = "your_log_name_here"  # Replace this with the name you used while saving the model
-    model_path = f"../models/{log_name}.h5"
+    model_path = f"models/{log_name}.h5"
     loaded_model = load_model(model_path)  # If you have custom layers
 
-    data_path = "../data/dataset_ohio_smooth_stdbyref.npy"
+    data_path = "data/dataset_ohio_smooth_stdbyref.npy"
     # 1. Load the data
     ds = np.load(data_path)
     ds = filter_stationary_sequences_dataset(ds)
@@ -36,7 +36,7 @@ def eval():
     new_test_dataset = tf.data.Dataset.from_tensor_slices((new_test_x, new_test_y))
 
 
-    log_dir = "../logs/new_test/" + log_name
+    log_dir = "logs/new_test/" + log_name
     tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
     image_logging_callback = CustomImageLogging(log_dir, new_test_dataset)
     classification_metrics_callback = ClassificationMetrics(

@@ -304,7 +304,7 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
             5 * x[0].shape[0], 5 * x[0].shape[0] + 5 * y_true[0].shape[0], 5
         )
         # cat x and y_true
-        x = np.concatenate((x.reshape(-1, 7), y_true), axis=1)
+        x = np.concatenate((np.reshape(x,(-1, 7)), y_true), axis=1)
         time_intervals_full = np.concatenate((time_intervals_x, time_intervals_y))
         print("x shape:", x.shape)
         print("time_intervals_full shape:", time_intervals_full.shape)

@@ -369,7 +369,7 @@ if __name__ == "__main__":
         pred_label_gp[:3],
         y_pred_std[:3],
         "gp_figs",
-        "baseline_figures/",
+        "baseline_figures_ohio/",
         config["data"]["mean"],
         config["data"]["std"],
     )
@@ -399,9 +399,9 @@ if __name__ == "__main__":
     cm = confusion_matrix(true_label_gp, pred_label_gp)
     cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
     # save cm_fig
-    plt.savefig("baseline_figures/confusion_matrix_gp.png")
+    plt.savefig("baseline_figures_ohio/confusion_matrix_gp.png")
     # save metrics to .txt file
-    with open("baseline_figures/metrics_gp.txt", "w") as f:
+    with open("baseline_figures_ohio/metrics_gp.txt", "w") as f:
         f.write(
             f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
         )
@@ -417,7 +417,7 @@ if __name__ == "__main__":
         test_y[:3],
         pred_label_svm[:3],
         "svm_figs",
-        "baseline_figures/",
+        "baseline_figures_ohio/",
         config["data"]["mean"],
         config["data"]["std"],
     )
@@ -446,9 +446,9 @@ if __name__ == "__main__":
     cm = confusion_matrix(true_label_svm, pred_label_svm)
     cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
     # save cm_fig
-    plt.savefig("baseline_figures/confusion_matrix_svm.png")
+    plt.savefig("baseline_figures_ohio/confusion_matrix_svm.png")
     # save metrics to .txt file
-    with open("baseline_figures/metrics_svm.txt", "w") as f:
+    with open("baseline_figures_ohio/metrics_svm.txt", "w") as f:
         f.write(
             f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
         )

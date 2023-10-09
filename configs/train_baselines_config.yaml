@@ -1,5 +1,5 @@
 data:
-  path: "./data/dataset_smooth.npy"
+  path: "./data/dataset_ohio_smooth_stdbyref.npy"
   n_train: 0 # 5000
   n_val: 0 # 10000
   n_test: -1 #10000

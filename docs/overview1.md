@@ -19,9 +19,9 @@ To ascertain the efficacy of our models, we compared our results with those from
 | F1             | 67.71%| 59.97%| **72.24%**| 70.58%| 71.61%    | 61.72%           | 57.40%           |
 
 
-*We note that our results surpass those of the reference paper and of other notable works in the field*. It should be noted that this are basic models, which do not leverage data augmentation or transfer learning. Performance is expected to increase when deploying these improvements. The robustenss of simple, baseline models such as GP can be appreciated seeing how they retain high scores on, e.g., Sensitivity. We attribute all of this to the high quantity and good quality of training data at our disposal, showing again the key importance of data when working with ML models. 
+*We note that our results surpass those of the reference paper and of other notable works in the field*. It should be noted that this are basic models, which do not leverage data augmentation or transfer learning. Performance is expected to increase when deploying these improvements. The robustness of simple, baseline models such as GP can be appreciated seeing how they retain high scores on, e.g., Sensitivity. We attribute all of this to the high quantity and good quality of training data at our disposal, showing again the key importance of data when working with ML models. 
 
-However, if instead of evaluating the models on the $\approx 15000$ BG sequences of the OhioT1DM dataset we evaluate them on an indipendent split of 500000 sequences from our test dataset, never before seeing during training, results are better than what we obtained for the previous table:
+However, if instead of evaluating the models on the $\approx 15000$ BG sequences of the OhioT1DM dataset we evaluate them on an independent split of $500000$ sequences from our test dataset, never before seeing during training, results are even better than what we obtained for the previous table:
 
 
 | Metrics        |    GP    |   SVM Chain  |  CNN (Basic) |  RNN (Basic) | Attention (Basic) |
@@ -33,7 +33,7 @@ However, if instead of evaluating the models on the $\approx 15000$ BG sequences
 | Specificity    |  93.71%  |    92.29%    |              |              |                   |
 | NPV            |  93.97%  |    89.18%    |              |              |                   |
 
-This may be indicating that our models are learning some intrinsic feature of our dataset, which makes generalization on different data sources more difficult. This issue has yet to be investigated further.
+This may be indicating that our models are learning some intrinsic feature of our dataset, which makes generalization on different data sources more difficult. On the other hand, given that the metrics have been calculated on a much larger sample than the previous one (about 33 times bigger), they may be considered more robust estimates of our models capacities. This issue has yet to be investigated further.
 
 ## Bayesian Hyperparameter Tuning with Keras
 

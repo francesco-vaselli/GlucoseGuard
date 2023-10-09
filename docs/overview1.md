@@ -9,7 +9,7 @@ To ascertain the efficacy of our models, we compared our results with those from
 
 **TODO** add losses comparison
 
-| Metrics        | GP    | SVM   | CNN   | RNN   | Attention | Ref paper (Best) | Bevan et al[^1]  |
+| Metrics        | GP    | SVM   | CNN (Basic)  | RNN (Basic)  | Attention (Basic) | Ref paper (Best) | Bevan et al[^1]  |
 |----------------|-------|-------|-------|-------|-----------|------------------|------------------|
 | Accuracy       | 95.21%| 94.80%|**96.28%**| 96.09%| 96.22%    | 95.98%           | 95.65%           |
 | Sensitivity    | **72.32%**| 56.19%| 69.57%| 67.50%| 68.64%    | 59.19%           | 49.94%           |

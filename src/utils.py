@@ -292,9 +292,9 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
         #    return
         # Get predictions
         x, y_true = next(iter(self.val_data.take(self.num_samples)))
-        x = np.reshape(x, (-1, 7))
         y_pred = self.model.predict(x)
         # multiply by std and add mean
+        print("x shape:", x.shape)
         x = x * self.std + self.mean
         y_true = y_true * self.std + self.mean
         y_pred = y_pred * self.std + self.mean
@@ -304,7 +304,6 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
             5 * x[0].shape[0], 5 * x[0].shape[0] + 5 * y_true[0].shape[0], 5
         )
         # cat x and y_true
-        
         x = np.concatenate((x, y_true), axis=1)
         time_intervals_full = np.concatenate((time_intervals_x, time_intervals_y))
 

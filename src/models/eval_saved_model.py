@@ -19,7 +19,7 @@ from src.utils import (
 
 )
 from sklearn.metrics import mean_squared_error, confusion_matrix, roc_curve, auc
-
+import itertools
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 # Your existing evaluation functions like plot_confusion_matrix, plot_roc_curve, check_classification...

@@ -303,6 +303,7 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
             5 * x[0].shape[0], 5 * x[0].shape[0] + 5 * y_true[0].shape[0], 5
         )
         # cat x and y_true
+        x = np.reshape(x, (-1, 7))
         x = np.concatenate((x, y_true), axis=1)
         time_intervals_full = np.concatenate((time_intervals_x, time_intervals_y))
 

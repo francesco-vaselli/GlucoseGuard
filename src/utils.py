@@ -332,7 +332,7 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
 
             ax.scatter(
                 time_intervals_full,
-                x,
+                x[i, :],
                 c="blue",
                 label="Actual Measurements",
                 marker="o",
@@ -342,7 +342,7 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
 
             ax.scatter(
                 time_intervals_y,
-                y_pred,
+                y_pred[i, :],
                 c="red",
                 label="Predicted Measurements",
                 marker="x",

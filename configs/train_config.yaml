@@ -1,7 +1,7 @@
-data_path: "./data/dataset_smooth_upsampled.npy"
-data_mean: 127.836
+data_path: "./data/dataset_smooth.npy"
+data_mean: 144.982 # 127.836
 # 144.98204040527344
-data_std: 60.410
+data_std:  57.9408 # 60.410
 # 57.940860748291016
 transfer_data_path: "./data/dataset_99908129.npy"
 n_train: 3000000
@@ -14,10 +14,10 @@ optimizer: "adam"
 loss: "mae"
 learning_rate: 0.0001
 save_model: True
-transfer_learning: True
+transfer_learning: False
 
 model_config:
-  model_type: "attn"
+  model_type: "rnn"
   cnn_config:
     n_conv_layers: 3
     filters: 160

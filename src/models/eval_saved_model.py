@@ -43,7 +43,7 @@ def eval():
     classification_metrics_callback = ClassificationMetrics(
         new_test_dataset, log_dir, test_y=new_test_y, threshold=80, std=144.98, mean=57.94
     )
-    loaded_model.predict(new_test_x,
+    loaded_model.evaluate(new_test_x,
                                  callbacks=[
             tensorboard_callback,
             image_logging_callback,

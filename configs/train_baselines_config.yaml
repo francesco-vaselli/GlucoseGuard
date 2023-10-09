@@ -1,8 +1,8 @@
 data:
   path: "./data/dataset_smooth.npy"
-  n_train: 5000
-  n_val: 10000
-  n_test: 10000
+  n_train: 0 # 5000
+  n_val: 0 # 10000
+  n_test: -1 #10000
   mean: 144.98204040527344
   std: 57.940860748291016
 arima:

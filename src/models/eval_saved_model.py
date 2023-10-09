@@ -23,6 +23,7 @@ def eval():
     log_name = "attn_transf_good"  # Replace this with the name you used while saving the model
     model_path = f"models/{log_name}.h5"
     loaded_model = load_model(model_path)  # If you have custom layers
+    print(loaded_model.input_shape)
 
     data_path = "data/dataset_ohio_smooth_stdbyref.npy"
     # 1. Load the data
@@ -30,7 +31,7 @@ def eval():
     ds = filter_stationary_sequences_dataset(ds)
 
     new_test_x = ds[:, :7].reshape(-1, 7, 1)
-    new_test_y = ds[:, 7:].reshape(-1,6, 1)
+    new_test_y = ds[:, 7:].reshape(-1, 6, 1)
     print("train_x shape:", new_test_x.shape)
 
     new_test_dataset = tf.data.Dataset.from_tensor_slices((new_test_x, new_test_y))
@@ -42,6 +43,8 @@ def eval():
     classification_metrics_callback = ClassificationMetrics(
         new_test_dataset, log_dir, test_y=new_test_y, threshold=80, std=144.98, mean=57.94
     )
+    loaded_model.predict(new_test_x)
+
 
     # model.evaluate() or model.predict()
     loaded_model.evaluate(

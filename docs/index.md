@@ -15,7 +15,7 @@ The problem is illustrated in the Figure below. We have a series of Blood Glucos
 
 We acknowledge the use of the [OpenAPS Data Commons](https://openaps.org/outcomes/data-commons/) dataset, and we would like to publicly thank the authors and the contributors for the effort of gathering so many real-world patient data and making them accessible.
 
-We acknowledge the use of the [The OhioT1DM](http://ceur-ws.org/Vol-2675/paper11.pdf) dataset for comparison with the reference paper, and we thank the University of Ohio for granting us access to the dataset.
+We acknowledge the use of the [OhioT1DM](http://ceur-ws.org/Vol-2675/paper11.pdf) dataset for comparison with the reference paper, and we thank the University of Ohio for granting us access to the dataset.
 
 Part of the codebase is inspired from [AccurateBG](https://github.com/yixiangD/AccurateBG/tree/main) which is released under MIT license
 

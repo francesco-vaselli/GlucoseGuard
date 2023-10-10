@@ -5,9 +5,19 @@ Subsequently, we ventured into the domain of deep learning, employing architectu
 
 ## Comparison of Results
 
-To ascertain the efficacy of our models, we compared our results with those from the reference paper *on the 6 patients form the 2020 test split of the OhioT1DM dataset*. The key metrics for the binary classification task with a prediction horizon of 30 minutes ([Table 1 of Reference Paper](https://www.nature.com/articles/s41746-021-00480-x/tables/1)) are summarized in the table below. 
+To ascertain the efficacy of our models, we compared our results with those from the reference paper *on the 6 patients form the 2020 test split of the OhioT1DM dataset*. The key metrics for MAE, RMSE and the binary classification task with a prediction horizon of 30 minutes ([Table 1 of Reference Paper](https://www.nature.com/articles/s41746-021-00480-x/tables/1)) are summarized in the tables below. As our dataset had a different normalization compared to that used in the reference paper, we found the Standard Deviation value in the code of the reference (`std = 60.565`, while we had `std = 57.941`) and we re-scaled our loss values to provide a fair comparison.
 
-**TODO** add losses comparison
+|     Model             | 30 min MAE | 30 min RMSE  |
+|------------------|------------|--------------|
+| GP               | 15.68      | 34.48        |
+| SVM Chain        | 14.56      | 30.12        |
+| CNN (Basic)      | **6.54**       | **9.48**         |
+| RNN (Basic)      | 6.64       | 9.59         |
+| Attention (Basic)| 6.62       | 9.57         |
+| Ref paper (Best) | 13.53      | 19.08        |
+| Bevan et al[^1]   | 14.37      | 18.23 (18.82a)|
+
+
 
 | Metrics        | GP    | SVM   | CNN (Basic)  | RNN (Basic)  | Attention (Basic) | Ref paper (Best) | Bevan et al[^1]  |
 |----------------|-------|-------|-------|-------|-----------|------------------|------------------|
@@ -34,10 +44,6 @@ However, if instead of evaluating the models on the $\approx 15000$ BG sequences
 | NPV            |  93.97%  |    89.18%    |              |              |                   |
 
 This may be indicating that our models are learning some intrinsic feature of our dataset, which makes generalization on different data sources more difficult. On the other hand, given that the metrics have been calculated on a much larger sample than the previous one (about 33 times bigger), they may be considered more robust estimates of our models capacities. This issue has yet to be investigated further.
-
-            <!-- # mean and std of training data of OhioT1DM, Bevan
-            mean = 158.288
-            std = 60.565 -->
 
 ## Bayesian Hyperparameter Tuning with Keras
 

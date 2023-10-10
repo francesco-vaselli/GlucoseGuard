@@ -405,6 +405,21 @@ if __name__ == "__main__":
         f.write(
             f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
         )
+    # compute MAE and RMSE
+    mae = mean_absolute_error(true_label_gp, pred_label_gp)
+    rmse = mean_squared_error(true_label_gp, pred_label_gp, squared=False)
+    print(f"for GP MAE: {mae}, RMSE: {rmse}")
+
+    # get back to original scale
+    mae = mae * 57.941
+    rmse = rmse * 57.941
+    print(f"for GP scaled MAE: {mae}, scaled RMSE: {rmse}")
+
+    # get values for comparison with other paper
+    scale_paper = 60.565/57.941
+    mae = mae * scale_paper
+    rmse = rmse * scale_paper
+    print(f"for GP paper scaled MAE: {mae}, paper scaled RMSE: {rmse}")
 
     print("------ Support Vector Machine ------")
     svm = pickle.load(open("saved_models/svm_chain_model.pkl", "rb"))
@@ -452,3 +467,18 @@ if __name__ == "__main__":
         f.write(
             f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
         )
+    # compute MAE and RMSE
+    mae = mean_absolute_error(true_label_svm, pred_label_svm)
+    rmse = mean_squared_error(true_label_svm, pred_label_svm, squared=False)
+    print(f"for SVM MAE: {mae}, RMSE: {rmse}")
+
+    # get back to original scale
+    mae = mae * 57.941
+    rmse = rmse * 57.941
+    print(f"for SVM scaled MAE: {mae}, scaled RMSE: {rmse}")
+
+    # get values for comparison with other paper
+    mae = mae * scale_paper
+    rmse = rmse * scale_paper
+    print(f"for SVM paper scaled MAE: {mae}, paper scaled RMSE: {rmse}")
+

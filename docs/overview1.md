@@ -5,7 +5,7 @@ Subsequently, we ventured into the domain of deep learning, employing architectu
 
 ## Comparison of Results
 
-To ascertain the efficacy of our models, we compared our results with those from the reference paper *on the 6 patients form the 2020 test split of the OhioT1DM dataset*. The key metrics for MAE, RMSE and the binary classification task with a prediction horizon of 30 minutes ([Table 1 of Reference Paper](https://www.nature.com/articles/s41746-021-00480-x/tables/1)) are summarized in the tables below. As our dataset had a different normalization compared to that used in the reference paper, we found the Standard Deviation value in the code of the reference (`std = 60.565`, while we had `std = 57.941`) and we re-scaled our loss values to provide a fair comparison.
+To ascertain the efficacy of our models, we compared our results with those from the reference paper *using data from the six patients in the 2020 test split of the OhioT1DM dataset.*. The key metrics for MAE, RMSE and the binary classification task with a prediction horizon of 30 minutes ([Table 1 of Reference Paper](https://www.nature.com/articles/s41746-021-00480-x/tables/1)) are summarized in the tables below. As our dataset underwent a different normalization process compared to the one used in the reference paper, we extracted the Standard Deviation value directly from the codebase of the reference paper, which was `std = 60.565` as opposed to our `std = 57.941`. We then re-scaled our loss values to provide a fair comparison.
 
 |     Model             | 30 min MAE | 30 min RMSE  |
 |------------------|------------|--------------|
@@ -19,7 +19,7 @@ To ascertain the efficacy of our models, we compared our results with those from
 
 
 
-| Metrics        | GP    | SVM   | CNN (Basic)  | RNN (Basic)  | Attention (Basic) | Ref paper (Best) | Bevan et al[^1]  |
+| Metrics        | GP    | SVM Chain  | CNN (Basic)  | RNN (Basic)  | Attention (Basic) | Ref paper (Best) | Bevan et al[^1]  |
 |----------------|-------|-------|-------|-------|-----------|------------------|------------------|
 | Accuracy       | 95.21%| 94.80%|**96.28%**| 96.09%| 96.22%    | 95.98%           | 95.65%           |
 | Sensitivity    | **72.32%**| 56.19%| 69.57%| 67.50%| 68.64%    | 59.19%           | 49.94%           |
@@ -29,7 +29,7 @@ To ascertain the efficacy of our models, we compared our results with those from
 | F1             | 67.71%| 59.97%| **72.24%**| 70.58%| 71.61%    | 61.72%           | 57.40%           |
 
 
-*We note that our results surpass those of the reference paper and of other notable works in the field. The performance on the regression task has been greatly improved. More importantly, improvements on Sensitivity, Precision and F1 score are all good indicators that the models are getting better at classifying potentially dangerous hypoglicemic events (the minority class of the dataset).* It should be noted that these are basic models, which do not leverage data augmentation or transfer learning. Performance is expected to increase when deploying these improvements. The robustness of simple, baseline models such as GP can be appreciated seeing how they retain high scores on, e.g., Sensitivity. We attribute all of this to the high quantity and good quality of training data at our disposal, showing again the key importance of data when working with ML models. 
+*We note that our results surpass those of the reference paper and of other notable works in the field. The performance on the regression task has been greatly improved. More importantly, improvements on Sensitivity, Precision and F1 score are all good indicators that the models are getting better at classifying potentially dangerous hypoglicemic events (the minority class of the dataset).* Note that our models are basic versions, not yet optimized with techniques like data augmentation or transfer learning. We expect performance to escalate upon deploying these improvements. The robustness of simple, baseline models such as GP is evident in their consistent high scores in metrics like Sensitivity. We attribute all of this to the high quantity and good quality of training data at our disposal, showing again the key importance of data when working with ML models. 
 
 However, if instead of evaluating the models on the $\approx 15000$ BG sequences of the OhioT1DM dataset we evaluate them on an independent split of $500000$ sequences from our test dataset, never seen before during training or validation, results are even better than what we obtained for the previous table:
 
@@ -43,7 +43,7 @@ However, if instead of evaluating the models on the $\approx 15000$ BG sequences
 | Specificity    |  93.71%  |    92.29%    |    **98.85%**          |    98.40%         |        98.41%           |
 | NPV            |  93.97%  |    89.18%    |      **98.54%**        |    98.53%          |        98.50%           |
 
-This may be indicating that our models are learning some intrinsic feature of our dataset, which makes generalization on different data sources more difficult. On the other hand, given that the metrics have been calculated on a much larger sample than the previous one (about 33 times bigger), they may be considered more robust estimates of our models capacities. This issue has yet to be investigated further.
+This suggests that our models may have picked up unique features in our dataset, which hampers their generalizability across different data sources. However, these metrics, derived from a dataset 33 times larger than the initial one, may be considered more robust estimates of our models capacities. This warrants further investigation into our models' performance.
 
 ## Bayesian Hyperparameter Tuning with Keras
 

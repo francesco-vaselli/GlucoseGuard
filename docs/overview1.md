@@ -40,8 +40,8 @@ However, if instead of evaluating the models on the $\approx 15000$ BG sequences
 | F1 score       |  71.86%  |    52.70%    |    79.46%    |   **80.77%** |      78.52%       |
 | Sensitivity    |  72.32%  |    48.46%    |  **80.44%**  |    80.16%    |      75.38%       |
 | Precision (PPV)|  71.40%  |    57.74%    |    78.51%    |    81.39%    |    **81.94%**     |
-| Specificity    |  93.71%  |    92.29%    |              |              |                   |
-| NPV            |  93.97%  |    89.18%    |              |              |                   |
+| Specificity    |  93.71%  |    92.29%    |    **98.85%**          |    98.40%         |        98.41%           |
+| NPV            |  93.97%  |    89.18%    |      **98.54%**        |    98.53%          |        98.50%           |
 
 This may be indicating that our models are learning some intrinsic feature of our dataset, which makes generalization on different data sources more difficult. On the other hand, given that the metrics have been calculated on a much larger sample than the previous one (about 33 times bigger), they may be considered more robust estimates of our models capacities. This issue has yet to be investigated further.
 

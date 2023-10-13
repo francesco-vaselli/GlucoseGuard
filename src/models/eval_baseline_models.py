@@ -378,6 +378,21 @@ if __name__ == "__main__":
     mae = mae * scale_paper
     rmse = rmse * scale_paper
     print(f"for GP paper scaled MAE: {mae}, paper scaled RMSE: {rmse}")
+
+        # now we do the same MAE and RMSE but only for the last point
+    mae = mean_absolute_error(true_label_gp[:, -1], pred_label_gp[:, -1])
+    rmse = mean_squared_error(true_label_gp[:, -1], pred_label_gp[:, -1], squared=False)
+    print(f"last point MAE: {mae}, last point RMSE: {rmse}")
+
+    # get back to original scale
+    mae = mae * 57.941
+    rmse = rmse * 57.941
+    print(f"last point scaled MAE: {mae}, last point scaled RMSE: {rmse}")
+    
+    # get values for comparison with other paper
+    mae = mae * scale_paper
+    rmse = rmse * scale_paper
+    print(f"paper scaled last point MAE: {mae}, paper scaled last point RMSE: {rmse}")
     
     plot_beautiful_fig_gp(
         test_x[:3],
@@ -441,6 +456,21 @@ if __name__ == "__main__":
     mae = mae * scale_paper
     rmse = rmse * scale_paper
     print(f"for SVM paper scaled MAE: {mae}, paper scaled RMSE: {rmse}")
+
+    # now we do the same MAE and RMSE but only for the last point
+    mae = mean_absolute_error(true_label_svm[:, -1], pred_label_svm[:, -1])
+    rmse = mean_squared_error(true_label_svm[:, -1], pred_label_svm[:, -1], squared=False)
+    print(f"last point MAE: {mae}, last point RMSE: {rmse}")
+
+    # get back to original scale
+    mae = mae * 57.941
+    rmse = rmse * 57.941
+    print(f"last point scaled MAE: {mae}, last point scaled RMSE: {rmse}")
+
+    # get values for comparison with other paper
+    mae = mae * scale_paper
+    rmse = rmse * scale_paper
+    print(f"paper scaled last point MAE: {mae}, paper scaled last point RMSE: {rmse}")
 
     # Use your existing function to plot results
     plot_beautiful_fig(

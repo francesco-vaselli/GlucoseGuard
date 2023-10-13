@@ -187,6 +187,21 @@ def eval():
     rmse = rmse * scale_paper
     print(f"for {log_name} paper scaled MAE: {mae}, paper scaled RMSE: {rmse}")
 
+    # now we do the same MAE and RMSE but only for the last point
+    mae = mean_absolute_error(new_test_y[:, -1], pred_y[:, -1])
+    rmse = mean_squared_error(new_test_y[:, -1], pred_y[:, -1], squared=False)
+    print(f"for {log_name} last point MAE: {mae}, last point RMSE: {rmse}")
+
+    # get back to original scale
+    mae = mae * 57.941
+    rmse = rmse * 57.941
+    print(f"for {log_name} last point scaled MAE: {mae}, last point scaled RMSE: {rmse}")
+    
+    # get values for comparison with other paper
+    mae = mae * scale_paper
+    rmse = rmse * scale_paper
+    print(f"for {log_name} paper scaled last point MAE: {mae}, paper scaled last point RMSE: {rmse}")
+
     new_test_x = new_test_x.reshape(-1, 7)
 
     plot_beautiful_fig(new_test_x[:3], new_test_y[:3], pred_y[:3], "new_test", log_dir, 144.98, 57.94)

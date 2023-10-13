@@ -252,7 +252,7 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
 
             cm = confusion_matrix(true_label, pred_label)
             figure = plot_confusion_matrix(
-                cm, class_names=["Above Threshold", "Below Threshold"]
+                cm, class_names=["Hyper", "Hypo"]
             )
             tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
 
@@ -268,7 +268,6 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
 
         # Convert PNG buffer to TF image
         image = tf.image.decode_png(buf.getvalue(), channels=4)
-
         # Expand the dimensions to [1, *, *, 4]
         image = tf.expand_dims(image, 0)
 
@@ -357,6 +356,8 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
             ax.text(
                 0.55, 0.85, "Prediction \n Horizon", transform=ax.transAxes, fontsize=15
             )
+
+            ax.legend(loc="upper left", fontsize=12)
 
             # Add labels and title
 

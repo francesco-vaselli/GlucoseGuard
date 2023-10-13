@@ -360,6 +360,8 @@ if __name__ == "__main__":
 
     print("------ Gaussian Process ------")
     gp = pickle.load(open("saved_models/gp_model.pkl", "rb"))
+    # The fitted kernel after hyperparameter optimization
+    print("Optimized Kernel: \n", gp.kernel_)
     true_label_gp = test_y
     pred_label_gp, y_pred_std = gp.predict(test_x, return_std=True)
 
@@ -439,6 +441,12 @@ if __name__ == "__main__":
 
     print("------ Support Vector Machine ------")
     svm = pickle.load(open("saved_models/svm_chain_model.pkl", "rb"))
+    for i, estimator in enumerate(svm.estimators_):
+        print(f"Optimized Parameters for Chain {i+1}:")
+        print("C:", estimator.C)
+        print("Epsilon:", estimator.epsilon)
+        print("Kernel:", estimator.kernel)
+        print("-----")
     true_label_svm = test_y
     pred_label_svm = svm.predict(test_x)
 

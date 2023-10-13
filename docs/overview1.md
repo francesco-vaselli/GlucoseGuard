@@ -5,17 +5,17 @@ Subsequently, we ventured into the domain of deep learning, employing architectu
 
 ## Comparison of Results
 
-To ascertain the efficacy of our models, we compared our results with those from the reference paper *using data from the six patients in the 2020 test split of the OhioT1DM dataset.*. The key metrics for MAE, RMSE and the binary classification task with a prediction horizon of 30 minutes ([Table 1 of Reference Paper](https://www.nature.com/articles/s41746-021-00480-x/tables/1)) are summarized in the tables below. As our dataset underwent a different normalization process compared to the one used in the reference paper, we extracted the Standard Deviation value directly from the codebase of the reference paper, which was `std = 60.565` as opposed to our `std = 57.941`. We then re-scaled our loss values to provide a fair comparison.
+To ascertain the efficacy of our models, we compared our results with those from the reference paper *using data from the six patients in the 2020 test split of the OhioT1DM dataset.*. The key metrics for MAE, RMSE and the binary classification task with a prediction horizon of 30 minutes ([Table 1 of Reference Paper](https://www.nature.com/articles/s41746-021-00480-x/tables/1)) are summarized in the tables below. As our dataset underwent a different normalization process compared to the one used in the reference paper, we extracted the Standard Deviation value directly from the codebase of the reference paper, which was `std = 60.565` as opposed to our `std = 57.941`. We then re-scaled our loss values to provide a fair comparison. We report loss scores computed on both the last 30 minute point of the target sequence and the entire 30 minute sequence. 
 
-|     Model             | 30 min MAE | 30 min RMSE  |
-|------------------|------------|--------------|
-| GP               | 15.68      | 34.48        |
-| SVM Chain        | 14.56      | 30.12        |
-| CNN (Basic)      | **6.54**       | **9.48**         |
-| RNN (Basic)      | 6.64       | 9.59         |
-| Attention (Basic)| 6.62       | 9.57         |
-| Ref paper (Best) | 13.53      | 19.08        |
-| Bevan et al[^1]   | 14.37      | 18.23 (18.82a)|
+|     Model             | 30 min point MAE | 30 min point RMSE  | 30 min seq MAE | 30 min seq RMSE
+|------------------|------------|--------------|------------|--------------|
+| GP               |21.72 | 37.95| 15.68      | 34.48        |
+| SVM Chain        |21.25 | 36.83 |14.56      | 30.12        |
+| CNN (Basic)      |**12.50** |**17.88** |**6.54**       | **9.48**         |
+| RNN (Basic)      |12.61 | 17.99 |6.64       | 9.59         |
+| Attention (Basic)|12.58 | 17.96 |6.62       | 9.57         |
+| Ref paper (Best) |13.53      | 19.08        |
+| Bevan et al[^1]    |14.37      | 18.23 (18.82a)| | |
 
 
 
@@ -29,7 +29,7 @@ To ascertain the efficacy of our models, we compared our results with those from
 | F1             | 67.71%| 59.97%| **72.24%**| 70.58%| 71.61%    | 61.72%           | 57.40%           |
 
 
-*We note that our results surpass those of the reference paper and of other notable works in the field. The performance on the regression task has been greatly improved. More importantly, improvements on Sensitivity, Precision and F1 score are all good indicators that the models are getting better at classifying potentially dangerous hypoglicemic events (the minority class of the dataset).* Note that our models are basic versions, not yet optimized with techniques like data augmentation or transfer learning. We expect performance to escalate upon deploying these improvements. The robustness of simple, baseline models such as GP is evident in their consistent high scores in metrics like Sensitivity. We attribute all of this to the high quantity and good quality of training data at our disposal, showing again the key importance of data when working with ML models. 
+*We note that our results surpass those of the reference paper and of other notable works in the field. The performance on the regression task has been improved. More importantly, improvements on Sensitivity, Precision and F1 score are all good indicators that the models are getting better at classifying potentially dangerous hypoglicemic events (the minority class of the dataset).* Note that our models are basic versions, not yet optimized with techniques like data augmentation or transfer learning. We expect performance to escalate upon deploying these improvements. The robustness of simple, baseline models such as GP is evident in their consistent high scores in metrics like Sensitivity. We attribute all of this to the high quantity and good quality of training data at our disposal, showing again the key importance of data when working with ML models. 
 
 However, if instead of evaluating the models on the $\approx 15000$ BG sequences of the OhioT1DM dataset we evaluate them on an independent split of $500000$ sequences from our test dataset, never seen before during training or validation, results are even better than what we obtained for the previous table:
 

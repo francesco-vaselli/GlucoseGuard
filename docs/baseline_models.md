@@ -26,11 +26,11 @@ $$
 \text{Kernel}=\text{Constant}×\text{RBF}+\text{White Noise} 
 $$
 
-| Hyperparameter       | Value      | Bounds          |
+| Hyperparameter       | Best Value      | Bounds          |
 |----------------------|------------|-----------------|
-| Constant             | 1.0        | [0.0001, 5000]  |
-| RBF                  | 10         | [0.001, 1000]   |
-| White Noise          | 0.01       | [0.00001, 1]    |
+| Constant             | 1.44**2        | [0.0001, 5000]  |
+| RBF                  | 0.535         | [0.001, 1000]   |
+| White Noise          | 0.00291       | [0.00001, 1]    |
 
 ### SVM Hyperparameters
 

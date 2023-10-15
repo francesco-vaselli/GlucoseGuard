@@ -158,10 +158,10 @@ def eval():
 
     mean = 144.98
     std = 57.94
-    new_test_x = [95, 105, 113, 121, 122, 122, 124]
-    new_test_y = [133, 140, 151, 160, 164, 163]
-    new_test_x = np.array(new_test_x).reshape(None, 1, 7)
-    new_test_y = np.array(new_test_y)
+    new_test_x = [81, 81, 82, 84, 86, 86, 88, 95]#[95, 105, 113, 121, 122, 122, 124]
+    new_test_y = [ 105, 113, 121, 122, 122, 124]#[133, 140, 151, 160, 164, 163]
+    new_test_x = np.array(new_test_x).reshape(-1, 7, 1)
+    new_test_y = np.array(new_test_y).reshape(-1, 6)
     print("train_x shape:", new_test_x.shape)
     # standardize
     new_test_x = (new_test_x - mean) / std
@@ -209,33 +209,33 @@ def eval():
     new_test_x = new_test_x.reshape(-1, 7)
 
     plot_beautiful_fig(new_test_x[:3], new_test_y[:3], pred_y[:3], "new_test", log_dir, 144.98, 57.94)
-    (
-        new_test_y,
-        pred_y,
-        fpr,
-        tpr,
-        roc_auc,
-        accuracy,
-        sensitivity,
-        specificity,
-        precision,
-        npv,
-        f1,
-    ) = check_classification(
-        new_test_y,
-        pred_y,
-        threshold=80,
-        std=57.94,
-        mean=144.98,
-    )
-    cm = confusion_matrix(new_test_y, pred_y)
-    cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
-    # save cm_fig
-    plt.savefig(log_dir+"/confusion_matrix_svm.png")
-    with open(log_dir+"/metrics.txt", "w") as f:
-        f.write(
-            f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
-        )
+    # (
+    #     new_test_y,
+    #     pred_y,
+    #     fpr,
+    #     tpr,
+    #     roc_auc,
+    #     accuracy,
+    #     sensitivity,
+    #     specificity,
+    #     precision,
+    #     npv,
+    #     f1,
+    # ) = check_classification(
+    #     new_test_y,
+    #     pred_y,
+    #     threshold=80,
+    #     std=57.94,
+    #     mean=144.98,
+    # )
+    # cm = confusion_matrix(new_test_y, pred_y)
+    # cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
+    # # save cm_fig
+    # plt.savefig(log_dir+"/confusion_matrix_svm.png")
+    # with open(log_dir+"/metrics.txt", "w") as f:
+    #     f.write(
+    #         f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
+    #     )
 
 if __name__ == "__main__":
     eval()

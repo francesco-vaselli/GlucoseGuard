@@ -160,13 +160,12 @@ def eval():
     std = 57.94
     new_test_x = [95, 105, 113, 121, 122, 122, 124]
     new_test_y = [133, 140, 151, 160, 164, 163]
-    # standardize
-    new_test_x = (new_test_x - mean) / std
-    new_test_y = (new_test_y - mean) / std
-
     new_test_x = np.array(new_test_x).reshape(None, 1, 7)
     new_test_y = np.array(new_test_y)
     print("train_x shape:", new_test_x.shape)
+    # standardize
+    new_test_x = (new_test_x - mean) / std
+    new_test_y = (new_test_y - mean) / std
 
     new_test_dataset = tf.data.Dataset.from_tensor_slices((new_test_x, new_test_y))
 

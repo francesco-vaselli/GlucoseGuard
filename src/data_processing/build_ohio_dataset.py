@@ -121,7 +121,7 @@ def main(data_config):
 
     # save data and targets as numpy arrays, in same file
     dataset = np.concatenate((data, targets), axis=1)
-    np.save("/home/fvaselli/Documents/PHD/TSA/TSA/data/data_ohio/dataset_ohio_smooth_stdbyupsampled.npy", dataset)
+    np.save("/home/fvaselli/Documents/TSA/data/data_ohio/dataset_ohio_smooth_stdbyupsampled.npy", dataset)
     # dataset = tf.data.Dataset.from_tensor_slices((data, targets))
     # save
     # dataset.save("data/dataset")

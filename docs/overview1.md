@@ -20,13 +20,14 @@ To ascertain the efficacy of our models, we compared our results with those from
 
 
 | Metrics        | GP    | SVM Chain  | CNN (Basic)  | RNN (Basic)  | Attention (Basic) | Ref paper (Best) | Bevan et al[^1]  |
-|----------------|-------|-------|-------|-------|-----------|------------------|------------------|
-| Accuracy       | 95.21%| 94.80%|**96.28%**| 96.09%| 96.22%    | 95.98%           | 95.65%           |
-| Sensitivity    | **72.32%**| 56.19%| 69.57%| 67.50%| 68.64%    | 59.19%           | 49.94%           |
-| Specificity    | 96.92%| 97.67%| **98.28%**| 98.22%| **98.28%**    | 98.15%           | 98.61%           |
-| Precision      | 63.64%| 64.29%| **75.11%**| 73.95%| 74.86%    | 67.68%           | 69.00%           |
-| NPV            | **97.92%**| 96.77%| 97.74%| 97.59%| 97.67%    | 97.55%           | 96.76%           |
-| F1             | 67.71%| 59.97%| **72.24%**| 70.58%| 71.61%    | 61.72%           | 57.40%           |
+|----------------|-------|------------|--------------|--------------|-------------------|------------------|------------------|
+| Accuracy       | 95.21%| 94.80%     | **96.28%**   | 96.09%       | 96.22%            | 95.98%           | 95.65%           |
+| F1             | 67.71%| 59.97%     | **72.24%**   | 70.58%       | 71.61%            | 61.72%           | 57.40%           |
+| Sensitivity    | **72.32%**| 56.19% | 69.57%      | 67.50%       | 68.64%            | 59.19%           | 49.94%           |
+| Precision      | 63.64%| 64.29%     | **75.11%**   | 73.95%       | 74.86%            | 67.68%           | 69.00%           |
+| Specificity    | 96.92%| 97.67%     | **98.28%**   | 98.22%       | **98.28%**        | 98.15%           | 98.61%           |
+| NPV            | **97.92%**| 96.77% | 97.74%      | 97.59%       | 97.67%            | 97.55%           | 96.76%           |
+
 
 
 *We note that our results surpass those of the reference paper and of other notable works in the field. The performance on the regression task has been improved. More importantly, improvements on Sensitivity, Precision and F1 score are all good indicators that the models are getting better at classifying potentially dangerous hypoglicemic events (the minority class of the dataset).* Note that our models are basic versions, not yet optimized with techniques like data augmentation or transfer learning. We expect performance to escalate upon deploying these improvements. The robustness of simple, baseline models such as GP is evident in their consistent high scores in metrics like Sensitivity. We attribute all of this to the high quantity and good quality of training data at our disposal, showing again the key importance of data when working with ML models. 
@@ -45,6 +46,28 @@ However, if instead of evaluating the models on the $\approx 15000$ BG sequences
 
 This suggests that our models may have picked up unique features in our dataset, which hampers their generalizability across different data sources. However, these metrics, derived from a dataset 33 times larger than the initial one, may be considered more robust estimates of our models capacities. This warrants further investigation into our models' performance.
 
+## Results for data augmentation
+
+Wishing to improve the performance on the minority class (hypoglicemic events), we re-trained our models on an augmented dataset. We used the MixUp data augmentation strategy with $\alpha = 2$ and augmented the minority data from $400,000$ to $1,200,000$. Results on the Ohio test partition for the models trained on this new dataset are reported below:
+
+|     Model          | 30 min point MAE | 30 min point RMSE | 30 min seq MAE | 30 min seq RMSE |
+|--------------------|------------------|-------------------|----------------|-----------------|
+| CNN (Upsampled)    | 12.30            | 17.71             | 6.43           | 9.37            |
+| RNN (Upsampled)    | **12.17**           | **17.54**             | **6.36**           | **9.28**            |
+| Attention (Upsampled)| 12.24          | 17.62             | 6.41           | 9.35            |
+
+| Metrics       |  CNN (Upsampled) |  RNN (Upsampled)  | Attention (Upsampled) |
+|---------------|----------------|-----------------|---------------------|
+| Accuracy      |     95.44%     |     95.63%      |       95.61%        |
+| F1 score      |     72.66%     |     73.22%      |       73.38%        |
+| Sensitivity   |     87.41% (+17%)     |     86.06% (+19%)     |       87.20%  (+19%)      |
+| Precision     |     62.18%  (-13%)   |     63.71%  (-10%)    |       63.34%  (-11%)      |
+| Specificity   |     96.04%     |     96.35%      |       96.24%        |
+| NPV           |     99.03%     |     98.93%      |       99.02%        |
+
+The + and - are in comparison with the baseline models performance on the Ohio test dataset. We can see that all the models have encountered the so-called "Sensitivity-Precision trade off". Sensitivity measures how well the models identify actual positives, and it improves when we up-sample the minority class. On the other hand, precision gauges the accuracy of the models' positive predictions. When we make the models more eager to predict positives by up-sampling, it sometimes mislabels negatives as positives, thus reducing precision. It's a tug-of-war between catching more true positives (sensitivity) and avoiding false positives (precision). Interestingly, we note a small improvement of the regression loss as well, for all the models.
+
+For addressing this tradeoff, we could implement weighted loss functions that more heavily penalize false positives, helping to increase precision. Another approach is utilizing ensemble methods, combining models that are strong in either sensitivity or precision to achieve a balanced performance. We could also experiment with adjusting the decision threshold for our classifiera; lowering it could increase precision without severely affecting sensitivity. 
 ## Bayesian Hyperparameter Tuning with Keras
 
 To select the best combination of hyperparameters for each model, we leveraged Keras' [BayesianOptimizationOracle](https://keras.io/api/keras_tuner/oracles/bayesian/) for hyperparameter tuning. Unlike traditional methods like grid search or random search, Bayesian optimization provides an intelligent approach to navigating the hyperparameter space. It builds a probabilistic model of the objective function based on past trial data and uses this to predict the most promising hyperparameters to try next. This guided strategy is computationally efficient and often yields more accurate models compared to standard choices.

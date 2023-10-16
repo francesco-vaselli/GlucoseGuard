@@ -12,5 +12,5 @@
 ### Longer Prediction Horizons
 - **Why It's Relevant**: Lengthening the prediction horizon would allow for more advanced planning and intervention. For example, it could give healthcare providers and patients a better chance to preemptively address hyperglycemic or hypoglycemic episodes, thus improving patient outcomes.
 
-### Tree Class Classification Problem
+### Three Class Classification Problem
 - **Why It's Relevant**: A three-class classification problem (e.g., hypoglycemic, normoglycemic, hyperglycemic) would offer a more nuanced understanding than a binary above-or-below threshold model. It would enable more targeted interventions based on the severity of the glucose level deviations, making the prediction more actionable.

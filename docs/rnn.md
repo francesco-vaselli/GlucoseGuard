@@ -17,5 +17,4 @@ Aside from the scores reported [in the overview](https://francesco-vaselli.githu
 
 ![The cm](img/cm_rnn.png)
 ![The ts](img/ts_rnn.png)
-
-TODO add loss curves
+![The loss](img/rnn_loss.png)

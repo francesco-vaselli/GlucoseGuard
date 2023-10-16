@@ -21,5 +21,4 @@ Aside from the scores reported [in the overview](https://francesco-vaselli.githu
 
 ![The cm](img/cm_att.png)
 ![The ts](img/ts_att.png)
-
-TODO add loss curves
+![The loss](img/attn_loss.png)

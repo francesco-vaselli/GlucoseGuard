@@ -112,8 +112,8 @@ def main(data_config):
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     data_dir = config["data_dir"]
-    ids = config["test_ids"]
-    test_ids = config["ids"]
+    ids = config["ids"]
+    test_ids = config["test_ids"]
     sampling_horizon = config["sampling_horizon"]
     prediction_horizon = config["prediction_horizon"]
     scale = config["scale"]

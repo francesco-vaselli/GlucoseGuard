@@ -193,6 +193,85 @@ def plot_beautiful_fig(x, y_true, y_pred, title, save_path, mean, std):
         fig.savefig(f"{save_path}{title}_{i}.png")
 
 
+def plot_beautiful_fig_gp(x, y_true, y_pred, y_pred_std, title, save_path, mean, std):
+    # multiply by std and add mean
+    x = x * std + mean
+    y_true = y_true * std + mean
+    y_pred = y_pred * std + mean
+
+    time_intervals_x = np.arange(0, 5 * x[0].shape[0], 5)
+    time_intervals_y = np.arange(
+        5 * x[0].shape[0], 5 * x[0].shape[0] + 5 * y_true[0].shape[0], 5
+    )
+    # cat x and y_true
+    x = np.concatenate((x, y_true), axis=1)
+    time_intervals_full = np.concatenate((time_intervals_x, time_intervals_y))
+
+    # Create figures and log them
+    for i in range(x.shape[0]):
+        # specify the figure size
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        # Plot the actual data points with circle markers
+
+        ax.scatter(
+            time_intervals_full,
+            x[i, :],
+            c="blue",
+            label="Actual Measurements",
+            marker="o",
+        )
+
+        # Plot the predicted data points with circle markers
+
+        ax.scatter(
+            time_intervals_y,
+            y_pred[i, :],
+            c="red",
+            label="Predicted Measurements",
+            marker="x",
+        )
+        # Add 1-std confidence interval
+        plt.fill_between(
+            time_intervals_y,
+            y_pred[i, :] - y_pred_std[i, :],
+            y_pred[i, :] + y_pred_std[i, :],
+            color="orange",
+            alpha=0.5,
+            label="1-std confidence interval",
+        )
+
+        # Add 3-std confidence interval
+        plt.fill_between(
+            time_intervals_y,
+            y_pred[i, :] - 3 * y_pred_std[i, :],
+            y_pred[i, :] + 3 * y_pred_std[i, :],
+            color="green",
+            alpha=0.2,
+            label="3-std confidence interval",
+        )
+        # add vertical line at 31 minutes and write the text "Sampling Time" on left, "Prediction Time" on right
+        # also add arrows pointing left and right
+        ax.axvline(x=31, color="black", linestyle="--")
+        ax.text(0.35, 0.85, "Sampling \n Horizon", transform=ax.transAxes, fontsize=15)
+        ax.text(
+            0.55, 0.85, "Prediction \n Horizon", transform=ax.transAxes, fontsize=15
+        )
+
+        # Add labels and title
+
+        ax.set_xlabel("Time (minutes)", fontsize=15)
+
+        ax.set_ylabel("Blood Glucose Level (mg/dL)", fontsize=15)
+
+        ax.set_title("Blood Glucose Level Over Time", fontsize=15)
+
+        ax.legend(loc="upper left", fontsize=15)
+
+        # save
+        fig.savefig(f"{save_path}{title}_{i}.png")
+
+
 def load_config(config_path):
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
@@ -280,17 +359,50 @@ if __name__ == "__main__":
     )
 
     print("------ Gaussian Process ------")
+    gp = pickle.load(open("saved_models/gp_model.pkl", "rb"))
+    # The fitted kernel after hyperparameter optimization
+    print("Optimized Kernel: \n", gp.kernel_)
     true_label_gp = test_y
-    pred_label_gp = train_evaluate_gp(
-        train_x, train_y, val_x, val_y, test_x, test_y, config
-    )
+    pred_label_gp, y_pred_std = gp.predict(test_x, return_std=True)
 
-    plot_beautiful_fig(
+    # compute MAE and RMSE
+    mae = mean_absolute_error(true_label_gp, pred_label_gp)
+    rmse = mean_squared_error(true_label_gp, pred_label_gp, squared=False)
+    print(f"for GP MAE: {mae}, RMSE: {rmse}")
+
+    # get back to original scale
+    mae = mae * 57.941
+    rmse = rmse * 57.941
+    print(f"for GP scaled MAE: {mae}, scaled RMSE: {rmse}")
+
+    # get values for comparison with other paper
+    scale_paper = 60.565/57.941
+    mae = mae * scale_paper
+    rmse = rmse * scale_paper
+    print(f"for GP paper scaled MAE: {mae}, paper scaled RMSE: {rmse}")
+
+        # now we do the same MAE and RMSE but only for the last point
+    mae = mean_absolute_error(true_label_gp[:, -1], pred_label_gp[:, -1])
+    rmse = mean_squared_error(true_label_gp[:, -1], pred_label_gp[:, -1], squared=False)
+    print(f"last point MAE: {mae}, last point RMSE: {rmse}")
+
+    # get back to original scale
+    mae = mae * 57.941
+    rmse = rmse * 57.941
+    print(f"last point scaled MAE: {mae}, last point scaled RMSE: {rmse}")
+    
+    # get values for comparison with other paper
+    mae = mae * scale_paper
+    rmse = rmse * scale_paper
+    print(f"paper scaled last point MAE: {mae}, paper scaled last point RMSE: {rmse}")
+    
+    plot_beautiful_fig_gp(
         test_x[:3],
         test_y[:3],
         pred_label_gp[:3],
+        y_pred_std[:3],
         "gp_figs",
-        "baseline_figures/",
+        "baseline_figures_ohio/",
         config["data"]["mean"],
         config["data"]["std"],
     )
@@ -320,18 +432,53 @@ if __name__ == "__main__":
     cm = confusion_matrix(true_label_gp, pred_label_gp)
     cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
     # save cm_fig
-    plt.savefig("baseline_figures/confusion_matrix_gp.png")
+    plt.savefig("baseline_figures_ohio/confusion_matrix_gp.png")
     # save metrics to .txt file
-    with open("baseline_figures/metrics_gp.txt", "w") as f:
+    with open("baseline_figures_ohio/metrics_gp.txt", "w") as f:
         f.write(
             f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
         )
 
     print("------ Support Vector Machine ------")
+    svm = pickle.load(open("saved_models/svm_chain_model.pkl", "rb"))
+    for i, estimator in enumerate(svm.estimators_):
+        print(f"Optimized Parameters for Chain {i+1}:")
+        print("C:", estimator.C)
+        print("Epsilon:", estimator.epsilon)
+        print("Kernel:", estimator.kernel)
+        print("-----")
     true_label_svm = test_y
-    pred_label_svm = train_evaluate_chain_svm(
-        train_x, train_y, val_x, val_y, test_x, test_y, config
-    )
+    pred_label_svm = svm.predict(test_x)
+
+    # compute MAE and RMSE
+    mae = mean_absolute_error(true_label_svm, pred_label_svm)
+    rmse = mean_squared_error(true_label_svm, pred_label_svm, squared=False)
+    print(f"for SVM MAE: {mae}, RMSE: {rmse}")
+
+    # get back to original scale
+    mae = mae * 57.941
+    rmse = rmse * 57.941
+    print(f"for SVM scaled MAE: {mae}, scaled RMSE: {rmse}")
+
+    # get values for comparison with other paper
+    mae = mae * scale_paper
+    rmse = rmse * scale_paper
+    print(f"for SVM paper scaled MAE: {mae}, paper scaled RMSE: {rmse}")
+
+    # now we do the same MAE and RMSE but only for the last point
+    mae = mean_absolute_error(true_label_svm[:, -1], pred_label_svm[:, -1])
+    rmse = mean_squared_error(true_label_svm[:, -1], pred_label_svm[:, -1], squared=False)
+    print(f"last point MAE: {mae}, last point RMSE: {rmse}")
+
+    # get back to original scale
+    mae = mae * 57.941
+    rmse = rmse * 57.941
+    print(f"last point scaled MAE: {mae}, last point scaled RMSE: {rmse}")
+
+    # get values for comparison with other paper
+    mae = mae * scale_paper
+    rmse = rmse * scale_paper
+    print(f"paper scaled last point MAE: {mae}, paper scaled last point RMSE: {rmse}")
 
     # Use your existing function to plot results
     plot_beautiful_fig(
@@ -339,7 +486,7 @@ if __name__ == "__main__":
         test_y[:3],
         pred_label_svm[:3],
         "svm_figs",
-        "baseline_figures/",
+        "baseline_figures_ohio/",
         config["data"]["mean"],
         config["data"]["std"],
     )
@@ -368,9 +515,10 @@ if __name__ == "__main__":
     cm = confusion_matrix(true_label_svm, pred_label_svm)
     cm_fig = plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"])
     # save cm_fig
-    plt.savefig("baseline_figures/confusion_matrix_svm.png")
+    plt.savefig("baseline_figures_ohio/confusion_matrix_svm.png")
     # save metrics to .txt file
-    with open("baseline_figures/metrics_svm.txt", "w") as f:
+    with open("baseline_figures_ohio/metrics_svm.txt", "w") as f:
         f.write(
             f"Accuracy: {accuracy}\nSensitivity: {sensitivity}\nSpecificity: {specificity}\nPrecision: {precision}\nNPV: {npv}\nF1: {f1}"
         )
+

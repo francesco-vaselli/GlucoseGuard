@@ -13,11 +13,10 @@ The best hyperparameters after optimization are the following:
 | n_dense_layers  | 2     |
 | dense_size      | 352   |
 
-## More results
+## More results and loss curves
 
 Aside from the scores reported [in the overview](https://francesco-vaselli.github.io/GlucoseGuard/overview1/), we show here the Confusion Matrix and a regression example for our network
 
 ![The cm](img/cm_cnn.png)
-![The ts](img/ts_cnn.png)
-
-TODO add loss curves
+![The ts](img/cnn_good_octnew_test_0.png)
+![The loss](img/cnn_loss.png)

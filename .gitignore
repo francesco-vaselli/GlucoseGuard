@@ -2,6 +2,7 @@
 data
 logs
 src/models/baseline_figures
+.npy
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

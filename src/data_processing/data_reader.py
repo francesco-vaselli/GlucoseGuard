@@ -2,7 +2,7 @@ import json
 import datetime
 from dateutil import parser
 from dateutil.parser import ParserError
-
+import xml.etree.ElementTree as ET
 
 
 class DataReader:
@@ -14,8 +14,30 @@ class DataReader:
     def read(self):
         if self.datatype == "OH":
             return self.read_OH()
+        elif self.datatype == "ohio":
+            return self.read_ohio()
         else:
             raise ValueError("Invalid datatype: {}".format(self.datatype))
+        
+    def read_ohio(self):
+        tree = ET.parse(self.filepath)
+        root = tree.getroot()
+
+        res = []
+        for item in root.findall("glucose_level"):
+            entry0 = item[0].attrib
+            res.append([float(entry0["value"])])
+            for i in range(1, len(item)):
+                last_entry = item[i - 1].attrib
+                entry = item[i].attrib
+                t1 = datetime.datetime.strptime(entry["ts"], "%d-%m-%Y %H:%M:%S")
+                t0 = datetime.datetime.strptime(last_entry["ts"], "%d-%m-%Y %H:%M:%S")
+                delt = t1 - t0
+                if delt <= self.interval_timedelta:
+                    res[-1].append(float(entry["value"]))
+                else:
+                    res.append([float(entry["value"])])
+        return res
 
     def read_OH(self):
         with open(self.filepath, "r") as file:

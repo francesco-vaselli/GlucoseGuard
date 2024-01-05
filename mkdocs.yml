@@ -21,7 +21,7 @@ nav:
       - CNN: cnn.md
       - RNN: rnn.md
       - Attention Network: attention.md
-    - Improvements: improvements.md
+    - Future Improvements: improvements.md
 
 
 

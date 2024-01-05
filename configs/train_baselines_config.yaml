@@ -1,8 +1,8 @@
 data:
-  path: "./data/dataset_smooth.npy"
-  n_train: 500000
-  n_val: 100000
-  n_test: 100000
+  path: "./data/dataset_ohio_smooth_stdbyref.npy"
+  n_train: 0 # 5000
+  n_val: 0 # 10000
+  n_test: -1 #10000
   mean: 144.98204040527344
   std: 57.940860748291016
 arima:
@@ -12,11 +12,17 @@ arima:
 # gp_config
 gp:
   kernel:
-    constant: 1.0
-    constant_bounds: [0.001, 1000]
-    rbf: 10
-    rbf_bounds: [0.01, 100]
-  n_restarts_optimizer: 10
+      constant: 1.0
+      constant_bounds: [0.0001, 5000]
+      rbf: 10
+      rbf_bounds: [0.001, 1000]
+      white_noise: 0.01
+      white_noise_bounds: [0.00001, 1]
+  n_restarts_optimizer: 50
+svm:
+  kernel: rbf
+  C: 1.0
+  gamma: "auto"
 
 metrics:
   threshold: 80

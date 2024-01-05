@@ -16,6 +16,5 @@ The best hyperparameters after optimization are the following:
 Aside from the scores reported [in the overview](https://francesco-vaselli.github.io/GlucoseGuard/overview1/), we show here the Confusion Matrix and a regression example for our network
 
 ![The cm](img/cm_rnn.png)
-![The ts](img/ts_rnn.png)
-
-TODO add loss curves
+![The ts](img/rnn_good_octnew_test_0.png)
+![The loss](img/rnn_loss.png)

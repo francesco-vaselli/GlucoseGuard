@@ -1,0 +1,37 @@
+# config for the full dataset builder 
+data_dir: "/home/fvaselli/Documents/PHD/TSA/TSA/data/data_ohio"
+# patients ids
+ids: ['540', '552', '544', '567', '584', '596']
+test_ids: []
+# sampling horizon
+sampling_horizon: 7
+# prediction horizon
+prediction_horizon: 6
+# scale
+scale: 1
+# outtype
+outtype: "History"
+# smooth
+smooth: True
+# target_weight
+target_weight: 1
+# standardize
+standardize: False
+standardize_by_ref: True
+standardize_params:
+  mean: 127.836 # 144.982
+  std: 60.410 #57.941
+# Computed Mean: 144.98199462890625, Computed Std: 58.11943817138672
+# dataset smooth Computed Mean: 144.98204040527344, Computed Std: 57.940860748291016
+# cutpoint (negative= take all the data)
+cutpoint: -1
+# augment type
+augmentation: null
+# augment factor
+augmentation_params:
+  num_augmentations: 1
+  padding: "History"
+
+
+
+

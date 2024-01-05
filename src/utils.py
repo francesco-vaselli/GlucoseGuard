@@ -141,7 +141,7 @@ def train_transfer(data_path, mean, std, log_name, batch_size, epochs, model):
     return model, history
 
 
-def plot_confusion_matrix(cm, class_names):
+def plot_confusion_matrix(cm, class_names=["Hyper", "Hypo"]):
     figure = plt.figure(figsize=(8, 8))
     plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
     plt.title("Confusion matrix")
@@ -159,7 +159,7 @@ def plot_confusion_matrix(cm, class_names):
         color = "black"
         plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
 
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
     return figure
@@ -252,7 +252,7 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
 
             cm = confusion_matrix(true_label, pred_label)
             figure = plot_confusion_matrix(
-                cm, class_names=["Above Threshold", "Below Threshold"]
+                cm, class_names=["Hyper", "Hypo"]
             )
             tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
 
@@ -268,7 +268,6 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
 
         # Convert PNG buffer to TF image
         image = tf.image.decode_png(buf.getvalue(), channels=4)
-
         # Expand the dimensions to [1, *, *, 4]
         image = tf.expand_dims(image, 0)
 
@@ -294,6 +293,7 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
         x, y_true = next(iter(self.val_data.take(self.num_samples)))
         y_pred = self.model.predict(x)
         # multiply by std and add mean
+        print("x shape:", x.shape)
         x = x * self.std + self.mean
         y_true = y_true * self.std + self.mean
         y_pred = y_pred * self.std + self.mean
@@ -303,9 +303,10 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
             5 * x[0].shape[0], 5 * x[0].shape[0] + 5 * y_true[0].shape[0], 5
         )
         # cat x and y_true
-        x = np.concatenate((x, y_true), axis=1)
+        x = np.concatenate((np.reshape(x,(-1, 7)), y_true), axis=1)
         time_intervals_full = np.concatenate((time_intervals_x, time_intervals_y))
-
+        print("x shape:", x.shape)
+        print("time_intervals_full shape:", time_intervals_full.shape)
         # Create figures and log them
         for i in range(self.num_samples):
             # fig, ax = plt.subplots(figsize=(12, 6))
@@ -330,7 +331,7 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
 
             ax.scatter(
                 time_intervals_full,
-                x,
+                x[i, :],
                 c="blue",
                 label="Actual Measurements",
                 marker="o",
@@ -340,7 +341,7 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
 
             ax.scatter(
                 time_intervals_y,
-                y_pred,
+                y_pred[i, :],
                 c="red",
                 label="Predicted Measurements",
                 marker="x",
@@ -355,6 +356,8 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
             ax.text(
                 0.55, 0.85, "Prediction \n Horizon", transform=ax.transAxes, fontsize=15
             )
+
+            ax.legend(loc="upper left", fontsize=12)
 
             # Add labels and title
 

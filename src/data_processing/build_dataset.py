@@ -10,6 +10,7 @@ from data_reader import DataReader
 
 def build_dataset(
     data_dir,
+    data_type,
     ids,
     test_ids,
     sampling_horizon,
@@ -53,7 +54,7 @@ def build_dataset(
     print(files_ids)
     for f, pid in zip(files, files_ids):
         reader = DataReader(
-                "OH", f, 5
+                data_type, f, 5
             )
         # a patient may have multiple json files
         # so we check if the patient is already in the dict
@@ -64,8 +65,18 @@ def build_dataset(
         
         print(f"Patient {pid} has {len(train_data[pid])} entries.")
 
+    # if data_type == "OH_24h", save the dict and return
+    if data_type == "OH_24h":
+        print("Saving dataset_24h.npy")
+        # print the shape of the dict
+        for k in train_data:
+            print(k, np.array(train_data[k]).shape)
+        train_data = np.array(train_data)
+        np.save("dataset_24h.npy", train_data)
+        print("Saved dataset_24h.npy")
+        return
     # a dumb dataset instance with first file of data_dir
-    train_dataset = CGMSDataSeg("OH", files[0], 5)
+    train_dataset = CGMSDataSeg(data_type, files[0], 5)
     print(len(train_dataset.data))  # Check length before
     train_pids = set(ids) - set(test_ids)
     local_train_data = []
@@ -112,6 +123,7 @@ def main(data_config):
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     data_dir = config["data_dir"]
+    data_type = config["data_type"]
     ids = config["ids"]
     test_ids = config["test_ids"]
     sampling_horizon = config["sampling_horizon"]
@@ -129,6 +141,7 @@ def main(data_config):
 
     data, targets = build_dataset(
         data_dir,
+        data_type,
         ids,
         test_ids,
         sampling_horizon,
@@ -147,10 +160,10 @@ def main(data_config):
 
     # save data and targets as numpy arrays, in same file
     dataset = np.concatenate((data, targets), axis=1)
-    np.save("dataset_99908129_smooth_up.npy", dataset)
+    np.save("dataset_full_no_smooth.npy", dataset)
     # dataset = tf.data.Dataset.from_tensor_slices((data, targets))
     # save
     # dataset.save("data/dataset")
 
 if __name__ == "__main__":
-    main('/home/fvaselli/Documents/PHD/TSA/TSA/configs/data_config.yaml')
+    main('/home/fvaselli/Documents/TSA/configs/data_config.yaml')

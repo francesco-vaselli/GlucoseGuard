@@ -156,7 +156,7 @@ class DataReader:
                 
                 if delt <= datetime.timedelta(hours=24):
                     if value is not None:
-                        t1_to_save = t1.hour * 3600 + t1.minute * 60 + t1.second
+                        t1_to_save = t1 # t1.hour * 3600 + t1.minute * 60 + t1.second
                         res[-1].append((value, t1_to_save))
                 else:
                     if value is not None:

@@ -16,6 +16,8 @@ class DataReader:
             return self.read_OH()
         elif self.datatype == "OH_24h":
             return self.read_OH_24h()
+        elif self.datatype == "OH_full":
+            return self.read_OH_full()
         elif self.datatype == "ohio":
             return self.read_ohio()
         else:
@@ -167,3 +169,46 @@ class DataReader:
                         t0 = t0.replace(hour=0, minute=0, second=0, microsecond=0)
 
         return res
+    
+    def read_OH_full(self):
+        """ reads all glucose and datetime data from OpenHumans
+        and returns a dict with keys Glucose and DateTime
+
+        If Glucose is None, skip the entry
+        """
+
+        with open(self.filepath, "r") as file:
+            data = json.load(file)
+
+        res = dict()
+        res["Glucose"] = []
+        res["DateTime"] = []
+
+        # Since data is in descending order, reverse it to process sequentially
+        data.reverse()
+        for i in range(0, len(data)):
+            try:
+                value = data[i]["sgv"]
+            except KeyError:
+                value = data[i].get(
+                        "mbg", None
+                    )
+            except IndexError:
+                value = None
+
+            if value is not None:
+
+                try:
+                    t = parser.parse(data[i]["dateString"]).replace(tzinfo=None)
+                except (IndexError, KeyError, ParserError):
+                    t = None
+
+            if (t is not None):
+                # Initialize with the  reading
+                res["Glucose"].append(value)
+                res["DateTime"].append(t)
+
+        return res
+
+            
+              

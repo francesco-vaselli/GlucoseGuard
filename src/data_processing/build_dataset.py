@@ -61,7 +61,15 @@ def build_dataset(
         if pid not in train_data:
             train_data[pid] = reader.read()
         else:
-            train_data[pid] += reader.read()
+            if data_type == "OH_full":
+                # we must append the lists to the existing ones
+                new_entry = reader.read()
+                glucose = train_data[pid]["Glucose"] + new_entry["Glucose"]
+                datetime = train_data[pid]["DateTime"] + new_entry["DateTime"]
+                train_data[pid] = {"Glucose": glucose, "DateTime": datetime}
+                
+            else:
+                train_data[pid] += reader.read()
         
         print(f"Patient {pid} has {len(train_data[pid])} entries.")
 
@@ -74,6 +82,16 @@ def build_dataset(
         train_data = np.array(train_data)
         np.save("dataset_24h.npy", train_data)
         print("Saved dataset_24h.npy")
+        return
+    
+    if data_type == "OH_full":
+        print("Saving dataset_full.npy")
+        # print the shape of the dict
+        for k in train_data:
+            print(k, np.array(train_data[k]).shape)
+        train_data = np.array(train_data)
+        np.save("dataset_full.npy", train_data)
+        print("Saved dataset_full.npy")
         return
     # a dumb dataset instance with first file of data_dir
     train_dataset = CGMSDataSeg(data_type, files[0], 5)

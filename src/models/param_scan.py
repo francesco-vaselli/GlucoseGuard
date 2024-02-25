@@ -30,9 +30,9 @@ def multi_label_classification(y_true, data_mean, data_std):
     # invert the normalization
     y_true = y_true * data_std + data_mean
     # apply the conditions
-    y_target = np.where(y_true[:, -1] < 80, [1, 0, 0], [0, 0, 0])
-    y_target = np.where(y_true[:, -1] >= 80, [0, 1, 0], y_target)
-    y_target = np.where(y_true[:, -1] >= 180, [0, 0, 1], y_target)
+    y_target = np.where(y_true[:, -1] < 80, 0, 1)
+    y_target = np.where(y_true[:, -1] >= 80, 1, y_target)
+    y_target = np.where(y_true[:, -1] >= 180, 2, y_target)
 
     return y_target
 
@@ -102,7 +102,7 @@ def build_transformer_model(hp, target="regression"):
     elif target == "classification":
         loss = tf.keras.losses.BinaryCrossentropy()
     elif target == "multi_classification":
-        loss = tf.keras.losses.CategoricalCrossentropy()
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()
 
     model.compile(optimizer=optimizer, loss=loss)
 
@@ -161,7 +161,7 @@ def build_cnn_model(hp, target="regression"):
     elif target == "classification":
         loss = tf.keras.losses.BinaryCrossentropy()
     elif target == "multi_classification":
-        loss = tf.keras.losses.CategoricalCrossentropy()
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()
 
     model.compile(optimizer=optimizer, loss=loss)
 
@@ -202,7 +202,13 @@ def build_rnn_model(hp, target="regression"):
         model.add(Dense(3, activation="softmax"))
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
-    loss = tf.keras.losses.MeanAbsoluteError()
+    if target == "regression":
+        loss = tf.keras.losses.MeanAbsoluteError()
+    elif target == "classification":
+        loss = tf.keras.losses.BinaryCrossentropy()
+    elif target == "multi_classification":
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()
+        
     model.compile(optimizer=optimizer, loss=loss)
 
     return model

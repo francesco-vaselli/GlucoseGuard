@@ -208,7 +208,7 @@ def build_rnn_model(hp, target="regression"):
         loss = tf.keras.losses.BinaryCrossentropy()
     elif target == "multi_classification":
         loss = tf.keras.losses.SparseCategoricalCrossentropy()
-        
+
     model.compile(optimizer=optimizer, loss=loss)
 
     return model
@@ -278,7 +278,7 @@ def train(
     # get one element from the val dataset and print its shape
     print("val_dataset shape:", next(iter(val_dataset.batch(1)))[0].shape)
     test_dataset = test_dataset.batch(BATCH_SIZE)
-    EPOCHS = 50
+    EPOCHS = 1000
 
     if model_type == "cnn":
         tuner = kt.BayesianOptimization(

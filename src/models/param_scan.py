@@ -378,6 +378,7 @@ def main():
                 learning_rate,
                 model_config,
                 model_type,
+                target,
             )
 
 

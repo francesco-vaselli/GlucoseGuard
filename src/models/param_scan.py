@@ -353,46 +353,46 @@ def main():
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     models = ["cnn", "rnn", "transformer"]
-    target = ["regression", "classification", "multi_classification"]
+    targets = ["regression", "classification", "multi_classification"]
 
-    # for current_model in models:
-    #     model_type = current_model
-    #     for target_type in target:
-    #         target = target_type
-    model_type = "rnn"
-    target = "multi_classification"
+    for current_model in models:
+        model_type = current_model
+        for target_type in target:
+            target = target_type
+    # model_type = "rnn"
+    # target = "multi_classification"
             
-    data_path = config["data_path"]
-    data_mean = config["data_mean"]
-    data_std = config["data_std"]
-    n_train = config["n_train"]
-    n_val = config["n_val"]
-    n_test = config["n_test"]
-    batch_size = config["batch_size"]
-    buffer_size = config["buffer_size"]
-    epochs = config["epochs"]
-    optimizer = config["optimizer"]
-    loss = config["loss"]
-    learning_rate = config["learning_rate"]
-    model_config = config["model_config"]
+            data_path = config["data_path"]
+            data_mean = config["data_mean"]
+            data_std = config["data_std"]
+            n_train = config["n_train"]
+            n_val = config["n_val"]
+            n_test = config["n_test"]
+            batch_size = config["batch_size"]
+            buffer_size = config["buffer_size"]
+            epochs = config["epochs"]
+            optimizer = config["optimizer"]
+            loss = config["loss"]
+            learning_rate = config["learning_rate"]
+            model_config = config["model_config"]
 
-    train(
-        data_path,
-        data_mean,
-        data_std,
-        n_train,
-        n_val,
-        n_test,
-        batch_size,
-        buffer_size,
-        epochs,
-        optimizer,
-        loss,
-        learning_rate,
-        model_config,
-        model_type,
-        target,
-    )
+            train(
+                data_path,
+                data_mean,
+                data_std,
+                n_train,
+                n_val,
+                n_test,
+                batch_size,
+                buffer_size,
+                epochs,
+                optimizer,
+                loss,
+                learning_rate,
+                model_config,
+                model_type,
+                target,
+            )
 
 
 if __name__ == "__main__":

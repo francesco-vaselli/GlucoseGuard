@@ -357,7 +357,7 @@ def main():
 
     for current_model in models:
         model_type = current_model
-        for target_type in target:
+        for target_type in targets:
             target = target_type
     # model_type = "rnn"
     # target = "multi_classification"

@@ -366,7 +366,7 @@ def main():
     #     for target_type in targets:
     #         target = target_type
     model_type = "rnn"
-    target = "multi_classification"
+    target = "classification"
             
     data_path = config["data_path"]
     data_mean = config["data_mean"]

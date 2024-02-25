@@ -103,6 +103,8 @@ def build_transformer_model(hp, target="regression"):
         loss = tf.keras.losses.BinaryCrossentropy()
     elif target == "multi_classification":
         loss = tf.keras.losses.SparseCategoricalCrossentropy()
+    else:
+        raise ValueError("target must be either regression, classification or multi_classification")
 
     model.compile(optimizer=optimizer, loss=loss)
 
@@ -162,6 +164,8 @@ def build_cnn_model(hp, target="regression"):
         loss = tf.keras.losses.BinaryCrossentropy()
     elif target == "multi_classification":
         loss = tf.keras.losses.SparseCategoricalCrossentropy()
+    else:
+        raise ValueError("target must be either regression, classification or multi_classification")
 
     model.compile(optimizer=optimizer, loss=loss)
 
@@ -212,6 +216,8 @@ def build_rnn_model(hp, target="regression"):
         print("#########")
         print("multi_classification loss activated")
         loss = tf.keras.losses.SparseCategoricalCrossentropy()
+    else:
+        raise ValueError("target must be either regression, classification or multi_classification")
 
     model.compile(optimizer=optimizer, loss=loss)
 

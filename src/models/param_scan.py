@@ -205,6 +205,8 @@ def build_rnn_model(hp, target="regression"):
     if target == "regression":
         loss = tf.keras.losses.MeanAbsoluteError()
     elif target == "classification":
+        print("#########")
+        print("classification loss activated")
         loss = tf.keras.losses.BinaryCrossentropy()
     elif target == "multi_classification":
         loss = tf.keras.losses.SparseCategoricalCrossentropy()

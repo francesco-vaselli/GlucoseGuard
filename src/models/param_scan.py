@@ -241,7 +241,7 @@ def train(
     test_x = ds[n_train + n_val : n_train + n_val + n_test, :7]
     test_y = ds[n_train + n_val : n_train + n_val + n_test, 7:]
     print("train_x shape:", train_x.shape)
-
+    print("train_y shape:", train_y.shape)
     # if target is classification, transform the target
     if target == "classification":
         train_y = two_label_classification(train_y, data_mean, data_std)
@@ -251,6 +251,7 @@ def train(
         train_y = multi_label_classification(train_y, data_mean, data_std)
         val_y = multi_label_classification(val_y, data_mean, data_std)
         test_y = multi_label_classification(test_y, data_mean, data_std)
+
 
     # Ensure that train_x has the right shape [samples, timesteps, features]
     # for the moment this stays
@@ -278,7 +279,7 @@ def train(
     # get one element from the val dataset and print its shape
     print("val_dataset shape:", next(iter(val_dataset.batch(1)))[0].shape)
     test_dataset = test_dataset.batch(BATCH_SIZE)
-    EPOCHS = 1000
+    EPOCHS = 50
 
     if model_type == "cnn":
         tuner = kt.BayesianOptimization(
@@ -315,7 +316,7 @@ def train(
         )
     # Using Mean Squared Error for regression tasks
 
-    stop_early = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=5)
+    # stop_early = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=5)
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
         monitor="val_loss", factor=0.2, patience=5, min_lr=0.0001
     )
@@ -323,7 +324,7 @@ def train(
         train_dataset,
         epochs=EPOCHS,
         validation_data=val_dataset,
-        callbacks=[stop_early, reduce_lr],
+        callbacks=[reduce_lr],
     )
 
     # Get the optimal hyperparameters
@@ -350,8 +351,8 @@ def main():
     models = ["cnn", "rnn", "transformer"]
     target = ["regression", "classification", "multi_classification"]
 
-    for model_type in models:
-        model_type = model_type
+    for current_model in models:
+        model_type = current_model
         for target_type in target:
             target = target_type
             

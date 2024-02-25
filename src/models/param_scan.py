@@ -295,7 +295,7 @@ def train(
         tuner = kt.BayesianOptimization(
             lambda hp: build_cnn_model(hp, target=target),
             objective="val_loss",
-            max_trials=100,
+            max_trials=1000,
             num_initial_points=None,
             alpha=0.0001,
             beta=2.6,
@@ -306,7 +306,7 @@ def train(
         tuner = kt.BayesianOptimization(
             lambda hp: build_rnn_model(hp, target=target),
             objective="val_loss",
-            max_trials=100,
+            max_trials=1000,
             num_initial_points=None,
             alpha=0.0001,
             beta=2.6,
@@ -317,7 +317,7 @@ def train(
         tuner = kt.BayesianOptimization(
             lambda hp: build_transformer_model(hp, target=target),
             objective="val_loss",
-            max_trials=100,
+            max_trials=1000,
             num_initial_points=None,
             alpha=0.0001,
             beta=2.6,

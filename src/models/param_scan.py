@@ -300,7 +300,7 @@ def train(
             alpha=0.0001,
             beta=2.6,
             directory="logs",
-            project_name="cnn_optim",
+            project_name=f"cnn_optim_{target},
         )
     elif model_type == "rnn":
         tuner = kt.BayesianOptimization(
@@ -311,7 +311,7 @@ def train(
             alpha=0.0001,
             beta=2.6,
             directory="logs",
-            project_name="rnn_optim",
+            project_name=f"rnn_optim_{target}"
         )
     elif model_type == "transformer":
         tuner = kt.BayesianOptimization(
@@ -322,7 +322,7 @@ def train(
             alpha=0.0001,
             beta=2.6,
             directory="logs",
-            project_name="transformer_optim",
+            project_name=f"transformer_optim_{target}"
         )
     # Using Mean Squared Error for regression tasks
 

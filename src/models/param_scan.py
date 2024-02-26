@@ -300,7 +300,7 @@ def train(
             alpha=0.0001,
             beta=2.6,
             directory="logs",
-            project_name=f"cnn_optim_{target},
+            project_name=f"cnn_optim_{target}",
         )
     elif model_type == "rnn":
         tuner = kt.BayesianOptimization(

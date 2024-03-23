@@ -10,6 +10,7 @@ from tensorflow.keras import layers
 from tensorflow import keras
 import datetime
 
+from param_scan import multi_label_classification, two_label_classification
 from src.utils import (
     CustomImageLogging,
     ClassificationMetrics,
@@ -212,6 +213,7 @@ def train(
     learning_rate,
     model_config,
     log_name,
+    target="regression",
     save_model=True,
     transfer_learning=False,
 ):
@@ -225,6 +227,17 @@ def train(
     test_x = ds[n_train + n_val : n_train + n_val + n_test, :7]
     test_y = ds[n_train + n_val : n_train + n_val + n_test, 7:]
     print("train_x shape:", train_x.shape)
+    # if target is classification, transform the target
+    if target == "classification":
+        train_y = two_label_classification(train_y, data_mean, data_std)
+        val_y = two_label_classification(val_y, data_mean, data_std)
+        test_y = two_label_classification(test_y, data_mean, data_std)
+    elif target == "multi_classification":
+        train_y = multi_label_classification(train_y, data_mean, data_std)
+        val_y = multi_label_classification(val_y, data_mean, data_std)
+        test_y = multi_label_classification(test_y, data_mean, data_std)
+
+
 
     # Ensure that train_x has the right shape [samples, timesteps, features]
     # for the moment this stays
@@ -262,10 +275,12 @@ def train(
     else:
         raise NotImplementedError(f"{optimizer} not implemented")
 
-    if loss == "mse":
-        loss = tf.keras.losses.MeanSquaredError()
-    elif loss == "mae":
+    if target == "regression":
         loss = tf.keras.losses.MeanAbsoluteError()
+    elif target == "multi_classification":
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()
+    elif target == "classification":
+        loss = tf.keras.losses.BinaryCrossentropy()
     else:
         raise NotImplementedError(f"{loss} not implemented")
 

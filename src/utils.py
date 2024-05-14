@@ -274,6 +274,58 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
         return image
 
 
+class ThreeClassClassificationMetrics(tf.keras.callbacks.Callback):
+    def __init__(self, val_data, log_dir, test_y, thresholds=(80, 180), std=57.94, mean=144.98):
+        super().__init__()
+        self.val_data = val_data
+        self.thresholds = thresholds
+        self.writer = tf.summary.create_file_writer(log_dir)
+        self.test_y = test_y
+        self.std = std
+        self.mean = mean
+
+    def on_epoch_end(self, epoch, logs=None):
+        y_pred = self.model.predict(self.val_data)
+        y_true = self.test_y
+
+        true_label, pred_label, fpr, tpr, roc_auc = check_classification(
+            y_true, y_pred, self.thresholds, std=self.std, mean=self.mean
+        )
+
+        with self.writer.as_default():
+            tf.summary.scalar("ROC AUC", roc_auc, step=epoch)
+
+            # You can add more metrics if desired, e.g.
+            cm = confusion_matrix(true_label, pred_label)
+            accuracy = np.trace(cm) / np.sum(cm)
+            tf.summary.scalar("Accuracy", accuracy, step=epoch)
+
+            # Log ROC curve
+            figure = plot_roc_curve(fpr, tpr, roc_auc)
+            tf.summary.image("ROC Curve", self.plot_to_image(figure), step=epoch)
+
+            figure = plot_confusion_matrix(
+                cm, class_names=["Class1", "Class2", "Class3"]
+            )
+            tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
+
+    def plot_to_image(self, figure):
+        """Converts the matplotlib plot specified by 'figure' to a PNG image and
+        returns it. The supplied figure is closed and inaccessible after this call."""
+        buf = io.BytesIO()
+
+        # Use plt.savefig to save the plot to a PNG in memory.
+        plt.savefig(buf, format="png")
+        plt.close(figure)
+        buf.seek(0)
+
+        # Convert PNG buffer to TF image
+        image = tf.image.decode_png(buf.getvalue(), channels=4)
+        # Expand the dimensions to [1, *, *, 4]
+        image = tf.expand_dims(image, 0)
+
+        return image
+
 class CustomImageLogging(tf.keras.callbacks.Callback):
     def __init__(self, log_dir, val_dataset, num_samples=3, std=57.94, mean=144.98):
         super().__init__()

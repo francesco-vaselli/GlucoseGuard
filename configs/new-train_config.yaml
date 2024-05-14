@@ -1,0 +1,90 @@
+data_path: "./data/dataset_smooth.npy"
+data_mean: 144.96 # 144.982 # 127.836
+# 144.98204040527344
+data_std:  58.062 # 57.9408 # 60.410
+# 57.940860748291016
+transfer_data_path: "./data/dataset_99908129.npy"
+n_train: 500000
+n_val: 300000
+n_test: 500000
+batch_size: 64
+buffer_size: 1000 # not used
+epochs: 200
+optimizer: "adam"
+loss: "mae"
+learning_rate: 0.0001
+save_model: True
+transfer_learning: False
+
+model_config:
+  regression:
+    cnn_config:
+      n_conv_layers: 6
+      filters: 320
+      kernel_size: 3
+      activation: "relu"
+      input_shape: [7, 1]
+      n_dense_layers: 2
+      dense_size: 32
+      output_shape: 6
+    rnn_config:
+      n_rnn_layers: 5
+      rnn_units: 512
+      n_dense_layers: 6
+      dense_size: 512
+      output_shape: 6
+      input_shape: [7, 1]
+    attn_config:
+      input_shape: [7, 1]
+      output_shape: 6
+      head_size: 32
+      num_heads: 5
+      ff_dim: 384
+      num_transformer_blocks: 6
+      mlp_units: [512,512,512,512]
+      mlp_dropout: 0.0
+      dropout: 0.0
+  classification:
+    cnn_config:
+      n_conv_layers: 6
+      filters: 512
+      kernel_size: 3
+      activation: "relu"
+      input_shape: [7, 1]
+      n_dense_layers: 1
+      dense_size: 32
+      output_shape: 6
+    rnn_config:
+      n_rnn_layers: 3
+      rnn_units: 416
+      n_dense_layers: 6
+      dense_size: 192
+      output_shape: 6
+      input_shape: [7, 1]
+    attn_config:
+      input_shape: [7, 1]
+      output_shape: 6
+      head_size: 512
+      num_heads: 8
+      ff_dim: 512
+      num_transformer_blocks: 6
+      mlp_units: [512,512,512,512]
+      mlp_dropout: 0.0
+      dropout: 0.0
+  multi_classification:
+    cnn_config:
+      n_conv_layers: 6
+      filters: 352
+      kernel_size: 3
+      activation: "relu"
+      input_shape: [7, 1]
+      n_dense_layers: 4
+      dense_size: 128
+      output_shape: 6
+    rnn_config:
+      n_rnn_layers: 4
+      rnn_units: 512
+      n_dense_layers: 2
+      dense_size: 512
+      output_shape: 6
+      input_shape: [7, 1]

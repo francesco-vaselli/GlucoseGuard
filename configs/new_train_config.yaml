@@ -53,17 +53,17 @@ model_config:
       input_shape: [7, 1]
       n_dense_layers: 1
       dense_size: 32
-      output_shape: 6
+      output_shape: 1
     rnn_config:
       n_rnn_layers: 3
       rnn_units: 416
       n_dense_layers: 6
       dense_size: 192
-      output_shape: 6
+      output_shape: 1
       input_shape: [7, 1]
     attn_config:
       input_shape: [7, 1]
-      output_shape: 6
+      output_shape: 1
       head_size: 512
       num_heads: 8
       ff_dim: 512
@@ -80,11 +80,11 @@ model_config:
       input_shape: [7, 1]
       n_dense_layers: 4
       dense_size: 128
-      output_shape: 6
+      output_shape: 3
     rnn_config:
       n_rnn_layers: 4
       rnn_units: 512
       n_dense_layers: 2
       dense_size: 512
-      output_shape: 6
+      output_shape: 3
       input_shape: [7, 1]

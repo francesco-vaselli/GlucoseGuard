@@ -14,6 +14,8 @@ from param_scan import multi_label_classification, two_label_classification
 from src.utils import (
     CustomImageLogging,
     ClassificationMetrics,
+    ClassificationMetrics1,
+    ClassificationMetrics3,
     filter_stationary_sequences_dataset,
     train_transfer,
 )
@@ -292,9 +294,6 @@ def train(
     # After setting up your train_dataset and val_dataset
     image_logging_callback = CustomImageLogging(log_dir, val_dataset)
     # Training the model with reducelronplateau callback and early stopping
-    classification_metrics_callback = ClassificationMetrics(
-        test_dataset, log_dir, test_y=test_y, threshold=80, std=data_std, mean=data_mean
-    )
     if target == "regression":
         callbacks_list = [
                 tf.keras.callbacks.ReduceLROnPlateau(
@@ -303,6 +302,9 @@ def train(
                 tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
                 tensorboard_callback,
                 image_logging_callback,
+                ClassificationMetrics(
+        test_dataset, log_dir, test_y=test_y, threshold=80, std=data_std, mean=data_mean
+    ),
             ]
     elif target == "classification":
         callbacks_list = [
@@ -311,7 +313,7 @@ def train(
                 ),
                 tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
                 tensorboard_callback,
-                classification_metrics_callback,
+                ClassificationMetrics1(test_dataset, log_dir, test_y=test_y),
             ]
     elif target == "multi_classification":
         callbacks_list = [
@@ -320,7 +322,7 @@ def train(
                 ),
                 tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
                 tensorboard_callback,
-                classification_metrics_callback,
+                ClassificationMetrics3(test_dataset, log_dir, test_y=test_y)
             ]
     EPOCHS = epochs
     history = model.fit(
@@ -354,7 +356,7 @@ def main():
     model_name = args.model_name
     targets = ["regression", "classification", "multi_classification"]
     # load cnn config from yaml
-    with open("configs/train_config.yaml", "r") as f:
+    with open("configs/new_train_config.yaml", "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     for target in targets:
@@ -373,6 +375,7 @@ def main():
         epochs = config["epochs"]
         optimizer = config["optimizer"]
         loss = config["loss"]
+        model_config = config["model_config"][target][f"{model_name}_config"]
         learning_rate = config["learning_rate"]
         save_model = config["save_model"]
         transfer_learning = config["transfer_learning"]

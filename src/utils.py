@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.callbacks import TensorBoard
-from sklearn.metrics import confusion_matrix, roc_curve, auc
+from sklearn.metrics import confusion_matrix, roc_curve, auc, roc_auc_score
 import itertools
 import seaborn as sns
 from scipy.signal import correlate
@@ -274,58 +274,6 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
         return image
 
 
-class ThreeClassClassificationMetrics(tf.keras.callbacks.Callback):
-    def __init__(self, val_data, log_dir, test_y, thresholds=(80, 180), std=57.94, mean=144.98):
-        super().__init__()
-        self.val_data = val_data
-        self.thresholds = thresholds
-        self.writer = tf.summary.create_file_writer(log_dir)
-        self.test_y = test_y
-        self.std = std
-        self.mean = mean
-
-    def on_epoch_end(self, epoch, logs=None):
-        y_pred = self.model.predict(self.val_data)
-        y_true = self.test_y
-
-        true_label, pred_label, fpr, tpr, roc_auc = check_classification(
-            y_true, y_pred, self.thresholds, std=self.std, mean=self.mean
-        )
-
-        with self.writer.as_default():
-            tf.summary.scalar("ROC AUC", roc_auc, step=epoch)
-
-            # You can add more metrics if desired, e.g.
-            cm = confusion_matrix(true_label, pred_label)
-            accuracy = np.trace(cm) / np.sum(cm)
-            tf.summary.scalar("Accuracy", accuracy, step=epoch)
-
-            # Log ROC curve
-            figure = plot_roc_curve(fpr, tpr, roc_auc)
-            tf.summary.image("ROC Curve", self.plot_to_image(figure), step=epoch)
-
-            figure = plot_confusion_matrix(
-                cm, class_names=["Class1", "Class2", "Class3"]
-            )
-            tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
-
-    def plot_to_image(self, figure):
-        """Converts the matplotlib plot specified by 'figure' to a PNG image and
-        returns it. The supplied figure is closed and inaccessible after this call."""
-        buf = io.BytesIO()
-
-        # Use plt.savefig to save the plot to a PNG in memory.
-        plt.savefig(buf, format="png")
-        plt.close(figure)
-        buf.seek(0)
-
-        # Convert PNG buffer to TF image
-        image = tf.image.decode_png(buf.getvalue(), channels=4)
-        # Expand the dimensions to [1, *, *, 4]
-        image = tf.expand_dims(image, 0)
-
-        return image
-
 class CustomImageLogging(tf.keras.callbacks.Callback):
     def __init__(self, log_dir, val_dataset, num_samples=3, std=57.94, mean=144.98):
         super().__init__()
@@ -441,3 +389,143 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
         image = tf.expand_dims(image, 0)
 
         return image
+
+def check_classification1(true, pred, threshold=0.5):
+    # Assuming true and pred have shape [batch_size, 1]
+    pred_label = (pred >= threshold).astype(int)
+    true_label = (true >= threshold).astype(int)
+
+    fpr, tpr, _ = roc_curve(true_label, pred_label)
+    roc_auc = auc(fpr, tpr)
+
+    return true_label, pred_label, fpr, tpr, roc_auc
+
+
+class ClassificationMetrics1(tf.keras.callbacks.Callback):
+    def __init__(self, val_data, log_dir, test_y, threshold=0.5):
+        super().__init__()
+        self.val_data = val_data
+        self.threshold = threshold
+        self.writer = tf.summary.create_file_writer(log_dir)
+        self.test_y = test_y
+
+    def on_epoch_end(self, epoch, logs=None):
+        y_pred = self.model.predict(self.val_data)
+        y_true = self.test_y
+
+        true_label, pred_label, fpr, tpr, roc_auc = check_classification1(
+            y_true, y_pred, self.threshold
+        )
+
+        with self.writer.as_default():
+            tf.summary.scalar("ROC AUC", roc_auc, step=epoch)
+
+            tn, fp, fn, tp = confusion_matrix(true_label, pred_label).ravel()
+            accuracy = (tn + tp) / (tn + fp + fn + tp)
+            sensitivity = tp / (tp + fn)
+            specificity = tn / (tn + fp)
+            precision = tp / (tp + fp)
+            npv = tn / (tn + fn)
+            f1 = 2 * (precision * sensitivity) / (precision + sensitivity)
+
+            tf.summary.scalar("Accuracy", accuracy, step=epoch)
+            tf.summary.scalar("Sensitivity", sensitivity, step=epoch)
+            tf.summary.scalar("Specificity", specificity, step=epoch)
+            tf.summary.scalar("Precision", precision, step=epoch)
+            tf.summary.scalar("NPV", npv, step=epoch)
+            tf.summary.scalar("F1", f1, step=epoch)
+
+            figure = plot_roc_curve1(fpr, tpr, roc_auc)
+            tf.summary.image("ROC Curve", self.plot_to_image(figure), step=epoch)
+
+            cm = confusion_matrix(true_label, pred_label)
+            figure = plot_confusion_matrix1(cm, class_names=["Class 0", "Class 1"])
+            tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
+
+    def plot_to_image(self, figure):
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png")
+        plt.close(figure)
+        buf.seek(0)
+        image = tf.image.decode_png(buf.getvalue(), channels=4)
+        image = tf.expand_dims(image, 0)
+        return image
+
+def plot_roc_curve1(fpr, tpr, roc_auc):
+    fig, ax = plt.subplots()
+    ax.plot(fpr, tpr, label=f'ROC curve (area = {roc_auc:0.2f})')
+    ax.plot([0, 1], [0, 1], 'k--')
+    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate')
+    ax.set_title('Receiver Operating Characteristic')
+    ax.legend(loc="lower right")
+    return fig
+
+def plot_confusion_matrix1(cm, class_names):
+    fig, ax = plt.subplots()
+    cax = ax.matshow(cm, cmap=plt.cm.Blues)
+    fig.colorbar(cax)
+    ax.set_xticklabels([''] + class_names)
+    ax.set_yticklabels([''] + class_names)
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    return fig
+
+def check_classification3(true, pred):
+    # Assuming true and pred have shape [batch_size, 3]
+    true_label = np.argmax(true, axis=1)
+    pred_label = np.argmax(pred, axis=1)
+
+    roc_auc = roc_auc_score(true, pred, multi_class="ovr")
+
+    return true_label, pred_label, roc_auc
+
+class ClassificationMetrics3(tf.keras.callbacks.Callback):
+    def __init__(self, val_data, log_dir, test_y):
+        super().__init__()
+        self.val_data = val_data
+        self.writer = tf.summary.create_file_writer(log_dir)
+        self.test_y = test_y
+
+    def on_epoch_end(self, epoch, logs=None):
+        y_pred = self.model.predict(self.val_data)
+        y_true = self.test_y
+
+        true_label, pred_label, roc_auc = check_classification3(y_true, y_pred)
+
+        with self.writer.as_default():
+            tf.summary.scalar("ROC AUC", roc_auc, step=epoch)
+
+            cm = confusion_matrix(true_label, pred_label)
+            accuracy = np.trace(cm) / np.sum(cm)
+            precision = np.diag(cm) / np.sum(cm, axis=0)
+            recall = np.diag(cm) / np.sum(cm, axis=1)
+            f1 = 2 * precision * recall / (precision + recall)
+
+            tf.summary.scalar("Accuracy", accuracy, step=epoch)
+            for i, cls in enumerate(["Class 0", "Class 1", "Class 2"]):
+                tf.summary.scalar(f"Precision_{cls}", precision[i], step=epoch)
+                tf.summary.scalar(f"Recall_{cls}", recall[i], step=epoch)
+                tf.summary.scalar(f"F1_{cls}", f1[i], step=epoch)
+
+            figure = plot_confusion_matrix3(cm, class_names=["Class 0", "Class 1", "Class 2"])
+            tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
+
+    def plot_to_image(self, figure):
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png")
+        plt.close(figure)
+        buf.seek(0)
+        image = tf.image.decode_png(buf.getvalue(), channels=4)
+        image = tf.expand_dims(image, 0)
+        return image
+
+def plot_confusion_matrix3(cm, class_names):
+    fig, ax = plt.subplots()
+    cax = ax.matshow(cm, cmap=plt.cm.Blues)
+    fig.colorbar(cax)
+    ax.set_xticklabels([''] + class_names)
+    ax.set_yticklabels([''] + class_names)
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    return fig

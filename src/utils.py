@@ -492,6 +492,9 @@ def check_classification3(true, pred):
     # Assuming true and pred have shape [batch_size, 3]
     true_label = np.argmax(true, axis=1)
     pred_label = np.argmax(pred, axis=1)
+    print("true_label shape:", true_label.shape)
+    print("pred_label shape:", pred_label.shape)
+    print("example pred vs true:", pred_label[0], true_label[0])
 
     roc_auc = roc_auc_score(true, pred, multi_class="ovr")
 

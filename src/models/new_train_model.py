@@ -399,6 +399,7 @@ def main():
             model_config,
             target,
             model_name,
+            target+"_"+model_name,
             save_model,
             transfer_learning,
         )

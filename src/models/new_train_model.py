@@ -10,7 +10,7 @@ from tensorflow.keras import layers
 from tensorflow import keras
 import datetime
 
-from param_scan import multi_label_classification, two_label_classification
+from .param_scan import multi_label_classification, two_label_classification
 from src.utils import (
     CustomImageLogging,
     ClassificationMetrics,

@@ -240,6 +240,9 @@ def train(
         train_y = multi_label_classification(train_y, data_mean, data_std)
         val_y = multi_label_classification(val_y, data_mean, data_std)
         test_y = multi_label_classification(test_y, data_mean, data_std)
+        print("train_y shape:", train_y.shape)
+        print("val_y shape:", val_y.shape)
+        print("test_y shape:", test_y.shape)
 
     # Ensure that train_x has the right shape [samples, timesteps, features]
     # for the moment this stays

@@ -491,6 +491,7 @@ def plot_confusion_matrix1(cm, class_names):
 def check_classification3(true, pred):
     # Assuming true and pred have shape [batch_size, 3]
     print("true shape:", true.shape)
+    print("pred shape:", pred.shape)
     true_label = np.argmax(true, axis=1)
     pred_label = np.argmax(pred, axis=1)
     print("true_label shape:", true_label.shape)

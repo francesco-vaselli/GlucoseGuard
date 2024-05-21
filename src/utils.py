@@ -442,7 +442,7 @@ class ClassificationMetrics1(tf.keras.callbacks.Callback):
             tf.summary.image("ROC Curve", self.plot_to_image(figure), step=epoch)
 
             cm = confusion_matrix(true_label, pred_label)
-            figure = plot_confusion_matrix1(cm, class_names=["Class 0", "Class 1"])
+            figure = plot_confusion_matrix1(cm, class_names=["Hypo", "Hyper"])
             tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
 
     def plot_to_image(self, figure):
@@ -520,12 +520,12 @@ class ClassificationMetrics3(tf.keras.callbacks.Callback):
             f1 = 2 * precision * recall / (precision + recall)
 
             tf.summary.scalar("Accuracy", accuracy, step=epoch)
-            for i, cls in enumerate(["Class 0", "Class 1", "Class 2"]):
+            for i, cls in enumerate(["Hypo", "Norm", "Hyper"]):
                 tf.summary.scalar(f"Precision_{cls}", precision[i], step=epoch)
                 tf.summary.scalar(f"Recall_{cls}", recall[i], step=epoch)
                 tf.summary.scalar(f"F1_{cls}", f1[i], step=epoch)
 
-            figure = plot_confusion_matrix3(cm, class_names=["Class 0", "Class 1", "Class 2"])
+            figure = plot_confusion_matrix3(cm, class_names=["Hypo", "Norm", "Hyper"])
             tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
 
     def plot_to_image(self, figure):
@@ -538,11 +538,24 @@ class ClassificationMetrics3(tf.keras.callbacks.Callback):
         return image
 
 def plot_confusion_matrix3(cm, class_names):
-    fig, ax = plt.subplots()
-    cax = ax.matshow(cm, cmap=plt.cm.Blues)
-    fig.colorbar(cax)
-    ax.set_xticklabels([''] + class_names)
-    ax.set_yticklabels([''] + class_names)
-    plt.xlabel('Predicted')
-    plt.ylabel('True')
-    return fig
+    figure = plt.figure(figsize=(8, 8))
+    plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
+    plt.title("Confusion matrix")
+    plt.colorbar()
+    tick_marks = np.arange(len(class_names))
+    plt.xticks(tick_marks, class_names, rotation=45)
+    plt.yticks(tick_marks, class_names)
+
+    # Normalize the confusion matrix.
+    cm = np.around(cm.astype("float") / cm.sum(axis=1)[:, np.newaxis], decimals=2)
+
+    # Use white text if squares are dark; otherwise black.
+    threshold = cm.max() / 2.0
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        color = "black"
+        plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
+
+    # plt.tight_layout()
+    plt.ylabel("True label")
+    plt.xlabel("Predicted label")
+    return figure

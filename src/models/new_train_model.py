@@ -123,6 +123,7 @@ def build_model(model_config, model_name):
                     kernel_size=cnn_config["kernel_size"],
                     activation=cnn_config["activation"],
                     input_shape=cnn_config["input_shape"],
+                    padding="same",
                 )
             )
 

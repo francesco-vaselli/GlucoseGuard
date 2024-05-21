@@ -21,7 +21,7 @@ model_config:
     cnn_config:
       n_conv_layers: 6
       filters: 320
-      kernel_size: 3
+      kernel_size: 2
       activation: "relu"
       input_shape: [7, 1]
       n_dense_layers: 2

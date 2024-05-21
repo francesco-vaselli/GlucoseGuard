@@ -137,7 +137,7 @@ def build_model(model_config, model_name):
             )
 
         # Add output layer
-        model.add(Dense(cnn_config["output_shape"]))
+        model.add(Dense(cnn_config["output_shape"], activation=cnn_config["output_activation"]))
         print("CNN model built:", "\n")
         model.summary()
 
@@ -161,7 +161,7 @@ def build_model(model_config, model_name):
             model.add(Dense(rnn_config["dense_size"], activation="relu"))
 
         # Add output layer
-        model.add(Dense(rnn_config["output_shape"]))
+        model.add(Dense(rnn_config["output_shape"], activation=rnn_config["output_activation"]))
         print("RNN model done")
         model.summary()
     elif model_name == "ar_rnn":

@@ -224,6 +224,7 @@ def train(
     # 1. Load the data
     ds = np.load(data_path)
     ds = filter_stationary_sequences_dataset(ds)
+    print("ds shape:", ds.shape)
     train_x = ds[:n_train, :7]
     train_y = ds[:n_train, 7:]
     val_x = ds[n_train : n_train + n_val, :7]

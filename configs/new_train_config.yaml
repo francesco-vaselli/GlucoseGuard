@@ -4,9 +4,9 @@ data_mean: 144.96 # 144.982 # 127.836
 data_std:  58.062 # 57.9408 # 60.410
 # 57.940860748291016
 transfer_data_path: "./data/dataset_99908129.npy"
-n_train: 500000
-n_val: 300000
-n_test: 500000
+n_train: 1000000
+n_val: 1000000
+n_test: 1000000
 batch_size: 64
 buffer_size: 1000 # not used
 epochs: 200

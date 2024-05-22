@@ -303,7 +303,7 @@ def train(
                 tf.keras.callbacks.ReduceLROnPlateau(
                     monitor="val_loss", factor=0.5, patience=5, min_lr=0.00001
                 ),
-                tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
+                tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20),
                 tensorboard_callback,
                 image_logging_callback,
                 ClassificationMetrics(
@@ -315,7 +315,7 @@ def train(
                 tf.keras.callbacks.ReduceLROnPlateau(
                     monitor="val_loss", factor=0.5, patience=5, min_lr=0.00001
                 ),
-                tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
+                tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20),
                 tensorboard_callback,
                 ClassificationMetrics1(test_dataset, log_dir, test_y=test_y),
             ]
@@ -324,7 +324,7 @@ def train(
                 tf.keras.callbacks.ReduceLROnPlateau(
                     monitor="val_loss", factor=0.5, patience=5, min_lr=0.00001
                 ),
-                tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=10),
+                tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20),
                 tensorboard_callback,
                 ClassificationMetrics3(test_dataset, log_dir, test_y=test_y)
             ]

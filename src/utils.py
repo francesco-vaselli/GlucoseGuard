@@ -197,8 +197,10 @@ def check_classification(
         pred *= 100
         true *= 100
 
-    pred_label = (pred[:, ind] < threshold).astype(int)  # Assuming feature_dim = 1
-    true_label = (true[:, ind] < threshold).astype(int)  # Adjust index if different
+    # NOTE now it is 0 for hypo and 1 for hyper
+    # diffrent from exam project!!
+    pred_label = (pred[:, ind] > threshold).astype(int)  # Assuming feature_dim = 1 
+    true_label = (true[:, ind] > threshold).astype(int)  # Adjust index if different
 
     fpr, tpr, _ = roc_curve(true_label, pred_label)
     roc_auc = auc(fpr, tpr)
@@ -238,7 +240,7 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
             specificity = tn / (tn + fp)
             precision = tp / (tp + fp)
             npv = tn / (tn + fn)
-            f1 = tp / (tp + 1 / 2 * (fp + fn))
+            f1 = 2 * (precision * sensitivity) / (precision + sensitivity)
             tf.summary.scalar("Accuracy", accuracy, step=epoch)
             tf.summary.scalar("Sensitivity", sensitivity, step=epoch)
             tf.summary.scalar("Specificity", specificity, step=epoch)
@@ -252,7 +254,7 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
 
             cm = confusion_matrix(true_label, pred_label)
             figure = plot_confusion_matrix(
-                cm, class_names=["Hyper", "Hypo"]
+                cm, class_names=["Hypo", "Hyper"]
             )
             tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
 
@@ -392,7 +394,9 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
 
 def check_classification1(true, pred, threshold=0.5):
     # Assuming true and pred have shape [batch_size, 1]
+    # 0 for hypo and 1 for hyper
     pred_label = (pred >= threshold).astype(int)
+    # 
     true_label = (true >= threshold).astype(int)
     print("true_label shape:", true_label.shape)
     print("pred_label shape:", pred_label.shape)
@@ -442,7 +446,7 @@ class ClassificationMetrics1(tf.keras.callbacks.Callback):
             tf.summary.image("ROC Curve", self.plot_to_image(figure), step=epoch)
 
             cm = confusion_matrix(true_label, pred_label)
-            figure = plot_confusion_matrix1(cm, class_names=["Hypo", "Hyper"])
+            figure = plot_confusion_matrix(cm, class_names=["Hypo", "Hyper"])
             tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
 
     def plot_to_image(self, figure):
@@ -464,28 +468,28 @@ def plot_roc_curve1(fpr, tpr, roc_auc):
     ax.legend(loc="lower right")
     return fig
 
-def plot_confusion_matrix1(cm, class_names):
-    figure = plt.figure(figsize=(8, 8))
-    plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
-    plt.title("Confusion matrix")
-    plt.colorbar()
-    tick_marks = np.arange(len(class_names))
-    plt.xticks(tick_marks, class_names, rotation=45)
-    plt.yticks(tick_marks, class_names)
+# def plot_confusion_matrix1(cm, class_names):
+#     figure = plt.figure(figsize=(8, 8))
+#     plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
+#     plt.title("Confusion matrix")
+#     plt.colorbar()
+#     tick_marks = np.arange(len(class_names))
+#     plt.xticks(tick_marks, class_names, rotation=45)
+#     plt.yticks(tick_marks, class_names)
 
-    # Normalize the confusion matrix.
-    cm = np.around(cm.astype("float") / cm.sum(axis=1)[:, np.newaxis], decimals=2)
+#     # Normalize the confusion matrix.
+#     cm = np.around(cm.astype("float") / cm.sum(axis=1)[:, np.newaxis], decimals=2)
 
-    # Use white text if squares are dark; otherwise black.
-    threshold = cm.max() / 2.0
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        color = "black"
-        plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
+#     # Use white text if squares are dark; otherwise black.
+#     threshold = cm.max() / 2.0
+#     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+#         color = "black"
+#         plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
 
-    # plt.tight_layout()
-    plt.ylabel("True label")
-    plt.xlabel("Predicted label")
-    return figure
+#     # plt.tight_layout()
+#     plt.ylabel("True label")
+#     plt.xlabel("Predicted label")
+#     return figure
 
 
 def check_classification3(true, pred):
@@ -522,16 +526,16 @@ class ClassificationMetrics3(tf.keras.callbacks.Callback):
             cm = confusion_matrix(true_label, pred_label)
             accuracy = np.trace(cm) / np.sum(cm)
             precision = np.diag(cm) / np.sum(cm, axis=0)
-            recall = np.diag(cm) / np.sum(cm, axis=1)
-            f1 = 2 * precision * recall / (precision + recall)
-
+            sensitivity = np.diag(cm) / np.sum(cm, axis=1)
+            f1 =  2 * (precision * sensitivity) / (precision + sensitivity)
+            
             tf.summary.scalar("Accuracy", accuracy, step=epoch)
             for i, cls in enumerate(["Hypo", "Norm", "Hyper"]):
                 tf.summary.scalar(f"Precision_{cls}", precision[i], step=epoch)
-                tf.summary.scalar(f"Recall_{cls}", recall[i], step=epoch)
+                tf.summary.scalar(f"sensitivity_{cls}", sensitivity[i], step=epoch)
                 tf.summary.scalar(f"F1_{cls}", f1[i], step=epoch)
 
-            figure = plot_confusion_matrix3(cm, class_names=["Hypo", "Norm", "Hyper"])
+            figure = plot_confusion_matrix(cm, class_names=["Hypo", "Norm", "Hyper"])
             tf.summary.image("Confusion Matrix", self.plot_to_image(figure), step=epoch)
 
     def plot_to_image(self, figure):
@@ -543,25 +547,25 @@ class ClassificationMetrics3(tf.keras.callbacks.Callback):
         image = tf.expand_dims(image, 0)
         return image
 
-def plot_confusion_matrix3(cm, class_names):
-    figure = plt.figure(figsize=(8, 8))
-    plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
-    plt.title("Confusion matrix")
-    plt.colorbar()
-    tick_marks = np.arange(len(class_names))
-    plt.xticks(tick_marks, class_names, rotation=45)
-    plt.yticks(tick_marks, class_names)
+# def plot_confusion_matrix3(cm, class_names):
+#     figure = plt.figure(figsize=(8, 8))
+#     plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
+#     plt.title("Confusion matrix")
+#     plt.colorbar()
+#     tick_marks = np.arange(len(class_names))
+#     plt.xticks(tick_marks, class_names, rotation=45)
+#     plt.yticks(tick_marks, class_names)
 
-    # Normalize the confusion matrix.
-    cm = np.around(cm.astype("float") / cm.sum(axis=1)[:, np.newaxis], decimals=2)
+#     # Normalize the confusion matrix.
+#     cm = np.around(cm.astype("float") / cm.sum(axis=1)[:, np.newaxis], decimals=2)
 
-    # Use white text if squares are dark; otherwise black.
-    threshold = cm.max() / 2.0
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        color = "black"
-        plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
+#     # Use white text if squares are dark; otherwise black.
+#     threshold = cm.max() / 2.0
+#     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+#         color = "black"
+#         plt.text(j, i, cm[i, j], horizontalalignment="center", color=color)
 
-    # plt.tight_layout()
-    plt.ylabel("True label")
-    plt.xlabel("Predicted label")
-    return figure
+#     # plt.tight_layout()
+#     plt.ylabel("True label")
+#     plt.xlabel("Predicted label")
+#     return figure

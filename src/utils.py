@@ -197,10 +197,10 @@ def check_classification(
         pred *= 100
         true *= 100
 
-    # NOTE now it is 0 for hypo and 1 for hyper
-    # diffrent from exam project!!
-    pred_label = (pred[:, ind] > threshold).astype(int)  # Assuming feature_dim = 1 
-    true_label = (true[:, ind] > threshold).astype(int)  # Adjust index if different
+    # NOTE now it is 1 for hypo and 0 for hyper
+    # we make it so for the other models
+    pred_label = (pred[:, ind] < threshold).astype(int)  # Assuming feature_dim = 1 
+    true_label = (true[:, ind] < threshold).astype(int)  # Adjust index if different
 
     fpr, tpr, _ = roc_curve(true_label, pred_label)
     roc_auc = auc(fpr, tpr)
@@ -240,7 +240,7 @@ class ClassificationMetrics(tf.keras.callbacks.Callback):
             specificity = tn / (tn + fp)
             precision = tp / (tp + fp)
             npv = tn / (tn + fn)
-            f1 = 2 * (precision * sensitivity) / (precision + sensitivity)
+            f1 = 2 * (precision * sensitivity) / (precision + sensitivity) # in this way the f1 is relative to the hyper class 
             tf.summary.scalar("Accuracy", accuracy, step=epoch)
             tf.summary.scalar("Sensitivity", sensitivity, step=epoch)
             tf.summary.scalar("Specificity", specificity, step=epoch)
@@ -394,10 +394,10 @@ class CustomImageLogging(tf.keras.callbacks.Callback):
 
 def check_classification1(true, pred, threshold=0.5):
     # Assuming true and pred have shape [batch_size, 1]
-    # 0 for hypo and 1 for hyper
-    pred_label = (pred >= threshold).astype(int)
+    # 1 for hypo and 0 for hyper
+    pred_label = (pred < threshold).astype(int)
     # 
-    true_label = (true >= threshold).astype(int)
+    true_label = (true < threshold).astype(int)
     print("true_label shape:", true_label.shape)
     print("pred_label shape:", pred_label.shape)
     print("example pred vs true:", pred_label[0], true_label[0])

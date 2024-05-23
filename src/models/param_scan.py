@@ -359,7 +359,7 @@ def main():
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     # models = ["cnn", "rnn", "transformer"]
-    targets = ["regression", "classification", "multi_classification"]
+    targets = ["multi_classification"]
 
     parser = argparse.ArgumentParser()
     parser.add_argument(

@@ -297,7 +297,7 @@ def train(
     # datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
     # After setting up your train_dataset and val_dataset
-    image_logging_callback = CustomImageLogging(log_dir, val_dataset)
+    image_logging_callback = CustomImageLogging(log_dir, val_dataset, std=data_std, mean=data_mean)
     # Training the model with reducelronplateau callback and early stopping
     if target == "regression":
         callbacks_list = [
